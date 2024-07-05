@@ -11,6 +11,7 @@ import { db } from '@/db';
 import * as schema from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { generateText } from "ai";
+import { PortfolioData, PortfolioOverview } from "@/components/client/overview";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const groq = createOpenAI({
@@ -96,180 +97,115 @@ export async function continueConversation(
       return <div>{content}</div>;
     },
     tools: {
-      getPortfolioOverview: {
-        description: "Get a comprehensive overview of the entire portfolio",
-        parameters: z.object({}),
-        generate: async function* () {
-          yield <div>Generating portfolio overview...</div>;
-          try {
-            const projects = await fetchAllData('projects');
-            const skills = await fetchAllData('skills');
-            const education = await fetchAllData('education');
-            const thoughts = await fetchAllData('thoughts');
-            const workExperience = await fetchAllData('work_experience');
-            const personalInfo = await fetchAllData('personal_info');
-    
-            const OverviewCard = ({ title, content }) => (
-              <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-                <h2 className="text-xl font-bold mb-4">{title}</h2>
-                {content}
-              </div>
-            );
-    
-            return (
-              <div className="space-y-6">
-                <OverviewCard 
-                  title="Personal Information" 
-                  content={
-                    <div>
-                      <p><strong>Name:</strong> {personalInfo[0]?.fullName}</p>
-                      <p><strong>Email:</strong> {personalInfo[0]?.email}</p>
-                      <p><strong>Location:</strong> {personalInfo[0]?.location}</p>
-                    </div>
-                  }
-                />
-                
-                <OverviewCard 
-                  title="Skills" 
-                  content={
-                    <ul className="list-disc pl-5">
-                      {skills.map((skill, index) => (
-                        <li key={index}>{skill.name} - {skill.category} (Proficiency: {skill.proficiency}/5)</li>
-                      ))}
-                    </ul>
-                  }
-                />
-                
-                <OverviewCard 
-                  title="Projects" 
-                  content={
-                    <div>
-                      {projects.map((project, index) => (
-                        <div key={index} className="mb-4">
-                          <h3 className="font-semibold">{project.title}</h3>
-                          <p>{project.shortDescription}</p>
-                        </div>
-                      ))}
-                    </div>
-                  }
-                />
-                
-                <OverviewCard 
-                  title="Education" 
-                  content={
-                    <div>
-                      {education.map((edu, index) => (
-                        <div key={index} className="mb-4">
-                          <h3 className="font-semibold">{edu.institution}</h3>
-                          <p>{edu.degree} in {edu.fieldOfStudy}</p>
-                          <p>{edu.startDate} - {edu.endDate}</p>
-                        </div>
-                      ))}
-                    </div>
-                  }
-                />
-                
-                <OverviewCard 
-                  title="Work Experience" 
-                  content={
-                    <div>
-                      {workExperience.map((exp, index) => (
-                        <div key={index} className="mb-4">
-                          <h3 className="font-semibold">{exp.company} - {exp.position}</h3>
-                          <p>{exp.startDate} - {exp.endDate}</p>
-                          <p>{exp.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  }
-                />
-                
-                <OverviewCard 
-                  title="Recent Thoughts" 
-                  content={
-                    <div>
-                      {thoughts.slice(0, 3).map((thought, index) => (
-                        <div key={index} className="mb-4">
-                          <h3 className="font-semibold">{thought.topic}</h3>
-                          <p>{thought.content.substring(0, 100)}...</p>
-                        </div>
-                      ))}
-                    </div>
-                  }
-                />
-              </div>
-            );
-          } catch (error) {
-            console.error('Error generating portfolio overview:', error);
-            return <div>Sorry, an error occurred while generating the portfolio overview.</div>;
-          }
-        },
-      },
-      getProject: {
-        description: "Get information about a specific project",
-        parameters: z.object({
-          projectName: z.string().describe("The name or description of the project to retrieve information about"),
-        }),
-        generate: async function* ({ projectName }) {
-          yield <div>Searching for project: {projectName}...</div>;
-          try {
-            const project = await fetchEntityData(projectName, 'projects');
-            if (!project) {
-              return <div>Sorry, I couldn't find a project matching "{projectName}".</div>;
+        getPortfolioOverview: {
+          description: "Get a comprehensive overview of the entire portfolio",
+          parameters: z.object({}),
+          generate: async function* () {
+            yield <div>Generating portfolio overview...</div>;
+            try {
+              const data: PortfolioData = {
+                projects: await fetchAllData('projects'),
+                skills: await fetchAllData('skills'),
+                education: await fetchAllData('education'),
+                thoughts: await fetchAllData('thoughts'),
+                workExperience: await fetchAllData('work_experience'),
+                personalInfo: await fetchAllData('personal_info'),
+              };
+  
+              return <PortfolioOverview data={data} />;
+            } catch (error) {
+              console.error('Error generating portfolio overview:', error);
+              return <div>Sorry, an error occurred while generating the portfolio overview.</div>;
             }
-
-            const { embedding: _, ...projectWithoutEmbedding } = project;
-
-            const prompt = `
-              You are an AI assistant describing a project in an engaging and informative way. 
-              Highlight the key aspects, technologies used, and any interesting features.
-              
-              Describe this project in a natural, engaging way using pure markdown format:
-
-              Here's the project data:
-              ${JSON.stringify(projectWithoutEmbedding)}
-
-              Your response should be in this format:
-              # [Project Title]
-
-              [A brief, engaging introduction to the project]
-
-              ## Key Features
-              - [Feature 1]
-              - [Feature 2]
-              - [Feature 3]
-
-              ## Technologies Used
-              [List of technologies, formatted as a bulleted list]
-
-              ## Project Details
-              [More detailed description of the project, its goals, and implementation]
-
-              ## Links
-              - GitHub: [GitHub link if available]
-              - Live Demo: [Live link if available]
-
-              Make sure to replace the placeholders with actual content from the project data.
-            `;
-
-            yield <div>Generating project description...</div>;
-
-            const { text: projectMarkdown } = await generateText({
-              model: model,
-              prompt: prompt,
-            });
-
-            return (
-              <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
-                <ReactMarkdown>{projectMarkdown}</ReactMarkdown>
-              </div>
-            );
-          } catch (error) {
-            console.error('Error fetching project:', error);
-            return <div>Sorry, an error occurred while retrieving the project information.</div>;
-          }
+          },
         },
-      },
+        getProject: {
+          description: "Get information about a specific project",
+          parameters: z.object({
+            projectName: z.string().describe("The name or description of the project to retrieve information about"),
+          }),
+          generate: async function* ({ projectName }) {
+            yield <div>Searching for project: {projectName}...</div>;
+            try {
+              let project;
+        
+              // First, try to fetch the project directly by name
+              const directResult = await db.execute(sql`
+                SELECT * FROM projects
+                WHERE title = ${projectName}
+                LIMIT 1
+              `);
+        
+              if (directResult.rows.length > 0) {
+                project = directResult.rows[0];
+              } else {
+                // If no exact match, fall back to embedding search
+                project = await fetchEntityData(projectName, 'projects');
+              }
+        
+              if (!project) {
+                return <div>Sorry, I couldn't find a project matching "{projectName}".</div>;
+              }
+        
+              const { embedding: _, ...projectWithoutEmbedding } = project;
+        
+              const prompt = `
+                You are an AI assistant describing a project in an engaging and informative way. 
+                Highlight the key aspects, technologies used, and any interesting features.
+                
+                Describe this project using proper Markdown format. Ensure you use Markdown syntax correctly for headers, lists, and links.
+        
+                Here's the project data:
+                ${JSON.stringify(projectWithoutEmbedding)}
+        
+                Your response MUST be in this exact Markdown format:
+        
+                # [Project Title]<Bold it>
+        
+                [A brief, engaging introduction to the project]
+        
+                ## Key Features
+        
+                - [Feature 1]
+                - [Feature 2]
+                - [Feature 3]
+        
+                ## Technologies Used
+        
+                - [Technology 1]
+                - [Technology 2]
+                - [Technology 3]
+        
+                ## Project Details<Bold>
+        
+                [More detailed description of the project, its goals, and implementation. Use proper Markdown formatting for any subheaders, lists, or emphasis needed.]
+        
+                ## Links
+        
+                - [GitHub](GitHub link if available)
+                - [Live Demo](Live demo link if available)
+        
+                Make sure to replace the placeholders with actual content from the project data. Use proper Markdown syntax throughout, including for links.
+              `;
+        
+              yield <div>Generating project description...</div>;
+        
+              const { text: projectMarkdown } = await generateText({
+                model: model,
+                prompt: prompt,
+              });
+        
+              return (
+                <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
+                  <ReactMarkdown>{projectMarkdown}</ReactMarkdown>
+                </div>
+              );
+            } catch (error) {
+              console.error('Error fetching project:', error);
+              return <div>Sorry, an error occurred while retrieving the project information.</div>;
+            }
+          },
+        },
       getSkill: {
         description: "Get information about a specific skill",
         parameters: z.object({
