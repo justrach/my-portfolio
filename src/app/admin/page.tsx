@@ -147,7 +147,10 @@ export default function AdminDashboard() {
       return response.data;
     } catch (error) {
       console.error('Error converting dates:', error);
-      alert('Failed to convert dates');
+      toast({
+        title: "Error",
+        description: 'Failed to convert dates',
+      });
     }
   };
 
@@ -208,6 +211,10 @@ export default function AdminDashboard() {
       setSelectedItem(null);
     } catch (err) {
       setError(`Error updating data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast({
+        title: "Error",
+        description: `Error updating data: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      });
     } finally {
       setLoading(false);
     }
@@ -228,6 +235,31 @@ export default function AdminDashboard() {
     setSelectedItem({});
     for (const field of formFields[tabs[selectedTab].entity]) {
       setValue(field.name, '');
+    }
+  };
+
+  const handleDeleteClick = async (item: any) => {
+    const entity = tabs[selectedTab].entity;
+    try {
+      const response = await axios.delete(`/api/deleteData`, {
+        params: { entity, id: item.id },
+      });
+
+      if (response.status !== 200) {
+        throw new Error('Failed to delete data');
+      }
+
+      fetchData();
+      toast({
+        title: "Success",
+        description: "Data deleted successfully.",
+      });
+    } catch (err) {
+      console.error(`Error deleting data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast({
+        title: "Error",
+        description: `Error deleting data: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      });
     }
   };
 
@@ -294,6 +326,12 @@ export default function AdminDashboard() {
                             className="text-indigo-600 hover:text-indigo-900"
                           >
                             Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(item)}
+                            className="text-red-600 hover:text-red-900 ml-4"
+                          >
+                            Delete
                           </button>
                         </td>
                       </tr>
