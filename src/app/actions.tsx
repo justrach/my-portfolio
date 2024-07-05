@@ -29,7 +29,17 @@ export interface ClientMessage {
   role: "user" | "assistant";
   display: ReactNode;
 }
-
+async function fetchAllData(tableName: string) {
+  try {
+    const result = await db.execute(sql`
+      SELECT * FROM ${sql.identifier(tableName)}
+    `);
+    return result.rows;
+  } catch (error) {
+    console.error(`Error fetching ${tableName} data:`, error);
+    return [];
+  }
+}
 async function fetchEntityData(query: string, tableName: string) {
   try {
     const response = await fetch('http://localhost:3000/api/embedding', {
@@ -86,6 +96,115 @@ export async function continueConversation(
       return <div>{content}</div>;
     },
     tools: {
+      getPortfolioOverview: {
+        description: "Get a comprehensive overview of the entire portfolio",
+        parameters: z.object({}),
+        generate: async function* () {
+          yield <div>Generating portfolio overview...</div>;
+          try {
+            const projects = await fetchAllData('projects');
+            const skills = await fetchAllData('skills');
+            const education = await fetchAllData('education');
+            const thoughts = await fetchAllData('thoughts');
+            const workExperience = await fetchAllData('work_experience');
+            const personalInfo = await fetchAllData('personal_info');
+    
+            const OverviewCard = ({ title, content }) => (
+              <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+                <h2 className="text-xl font-bold mb-4">{title}</h2>
+                {content}
+              </div>
+            );
+    
+            return (
+              <div className="space-y-6">
+                <OverviewCard 
+                  title="Personal Information" 
+                  content={
+                    <div>
+                      <p><strong>Name:</strong> {personalInfo[0]?.fullName}</p>
+                      <p><strong>Email:</strong> {personalInfo[0]?.email}</p>
+                      <p><strong>Location:</strong> {personalInfo[0]?.location}</p>
+                    </div>
+                  }
+                />
+                
+                <OverviewCard 
+                  title="Skills" 
+                  content={
+                    <ul className="list-disc pl-5">
+                      {skills.map((skill, index) => (
+                        <li key={index}>{skill.name} - {skill.category} (Proficiency: {skill.proficiency}/5)</li>
+                      ))}
+                    </ul>
+                  }
+                />
+                
+                <OverviewCard 
+                  title="Projects" 
+                  content={
+                    <div>
+                      {projects.map((project, index) => (
+                        <div key={index} className="mb-4">
+                          <h3 className="font-semibold">{project.title}</h3>
+                          <p>{project.shortDescription}</p>
+                        </div>
+                      ))}
+                    </div>
+                  }
+                />
+                
+                <OverviewCard 
+                  title="Education" 
+                  content={
+                    <div>
+                      {education.map((edu, index) => (
+                        <div key={index} className="mb-4">
+                          <h3 className="font-semibold">{edu.institution}</h3>
+                          <p>{edu.degree} in {edu.fieldOfStudy}</p>
+                          <p>{edu.startDate} - {edu.endDate}</p>
+                        </div>
+                      ))}
+                    </div>
+                  }
+                />
+                
+                <OverviewCard 
+                  title="Work Experience" 
+                  content={
+                    <div>
+                      {workExperience.map((exp, index) => (
+                        <div key={index} className="mb-4">
+                          <h3 className="font-semibold">{exp.company} - {exp.position}</h3>
+                          <p>{exp.startDate} - {exp.endDate}</p>
+                          <p>{exp.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  }
+                />
+                
+                <OverviewCard 
+                  title="Recent Thoughts" 
+                  content={
+                    <div>
+                      {thoughts.slice(0, 3).map((thought, index) => (
+                        <div key={index} className="mb-4">
+                          <h3 className="font-semibold">{thought.topic}</h3>
+                          <p>{thought.content.substring(0, 100)}...</p>
+                        </div>
+                      ))}
+                    </div>
+                  }
+                />
+              </div>
+            );
+          } catch (error) {
+            console.error('Error generating portfolio overview:', error);
+            return <div>Sorry, an error occurred while generating the portfolio overview.</div>;
+          }
+        },
+      },
       getProject: {
         description: "Get information about a specific project",
         parameters: z.object({
