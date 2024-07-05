@@ -1,0 +1,74 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model education {
+  id             Int                    @id @default(autoincrement())
+  institution    String                 @db.VarChar(255)
+  degree         String                 @db.VarChar(255)
+  field_of_study String                 @db.VarChar(255)
+  start_date     DateTime?              @db.Date
+  end_date       DateTime?              @db.Date
+  description    String?
+  embedding      Unsupported("vector")?
+}
+
+model personal_info {
+  id        Int                    @id @default(autoincrement())
+  full_name String                 @db.VarChar(255)
+  email     String?                @db.VarChar(255)
+  phone     String?                @db.VarChar(20)
+  location  String?                @db.VarChar(255)
+  bio       String?
+  embedding Unsupported("vector")?
+}
+
+model project_images {
+  id         Int       @id @default(autoincrement())
+  project_id Int?
+  image_url  String    @db.VarChar(255)
+  caption    String?
+  projects   projects? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model projects {
+  id                Int                    @id @default(autoincrement())
+  title             String                 @db.VarChar(255)
+  short_description String
+  long_description  String
+  technologies      String[]
+  start_date        DateTime?              @db.Date
+  end_date          DateTime?              @db.Date
+  github_link       String?                @db.VarChar(255)
+  live_link         String?                @db.VarChar(255)
+  embedding         Unsupported("vector")?
+  project_images    project_images[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model skills {
+  id          Int                    @id @default(autoincrement())
+  name        String                 @db.VarChar(100)
+  category    String                 @db.VarChar(100)
+  proficiency Int?
+  embedding   Unsupported("vector")?
+}
+
+model thoughts {
+  id         Int                    @id @default(autoincrement())
+  topic      String                 @db.VarChar(255)
+  content    String
+  date_added DateTime               @default(dbgenerated("CURRENT_DATE")) @db.Date
+  embedding  Unsupported("vector")?
+}
+
+model work_experience {
+  id          Int                    @id @default(autoincrement())
+  company     String                 @db.VarChar(255)
+  position    String                 @db.VarChar(255)
+  start_date  DateTime?              @db.Date
+  end_date    DateTime?              @db.Date
+  description String?
+  embedding   Unsupported("vector")?
+}
