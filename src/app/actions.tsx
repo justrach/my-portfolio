@@ -15,6 +15,7 @@ import { PortfolioData, PortfolioOverview } from "@/components/client/overview";
 import { projects, skills, education, thoughts, workExperience, personalInfo } from '@/db/schema';
 import { CardComponent } from "./components/ui/acc_ui/Card";
 import ProjectOverview from "./components/ui/project_overview";
+import { CodingLanguagesPieChart } from "@/components/client/codingLanguagesPieChart";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const groq = createOpenAI({
   baseURL: 'https://api.groq.com/openai/v1',
@@ -626,6 +627,19 @@ export async function continueConversation(
           } catch (error) {
             console.error('Error fetching personal information:', error);
             return <div>Sorry, an error occurred while retrieving the personal information.</div>;
+          }
+        },
+      },
+      getCodingLanguages: {
+        description: "Get information about the coding languages I know",
+        parameters: z.object({}),
+        generate: async function* () {
+          yield <div>Generating coding languages overview...</div>;
+          try {
+            return <CodingLanguagesPieChart />;
+          } catch (error) {
+            console.error('Error generating coding languages overview:', error);
+            return <div>Sorry, an error occurred while generating the coding languages overview.</div>;
           }
         },
       },

@@ -18,13 +18,13 @@ const exampleMessages = [
   },
   {
     heading: 'What are your',
-    subheading: 'key skills?',
-    message: 'What are your main skills and expertise?'
+    subheading: 'some projects you have done?',
+    message: 'List projects you have worked on'
   },
   {
-    heading: 'Recent projects',
-    subheading: 'you worked on',
-    message: 'Tell me about your recent projects'
+    heading: 'What are your',
+    subheading: 'favourite programming languages?',
+    message: 'Tell me about your programming languages'
   },
 ];
 
