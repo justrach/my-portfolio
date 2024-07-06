@@ -1,30 +1,3 @@
-// import { createOpenAI, openai } from "@ai-sdk/openai";
-// import { streamText } from "ai";
-
-// export const maxDuration = 30;
-
-// export async function POST(req: Request) {
-//   const { messages } = await req.json();
-//   const groq = createOpenAI({
-//     baseURL: 'https://api.groq.com/openai/v1',
-//     apiKey: process.env.GROQ_API_KEY,
-//   });
-//   const model = groq('llama3-8b-8192');
-//   const result = await streamText({
-//     prompt:"",
-//     model: model,
-//     messages,
-//   });
-
-//   return result.toAIStreamResponse();
-// }
-// app/api/chat/route.ts
-
-// app/api/chat/route.ts
-// app/api/chat/route.ts
-
-// app/api/chat/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createOpenAI } from "@ai-sdk/openai";
 import OpenAI from "openai";
@@ -59,9 +32,15 @@ async function getCompletion(groq2: OpenAI, message: any) {
 
 export async function POST(req: NextRequest) {
   const { messages } = await req.json();
+  const apiKey = process.env.GROQ_API_KEY;
+
+  if (!apiKey) {
+    return NextResponse.json({ error: 'API key is missing' }, { status: 400 });
+  }
+
   const groq2 = new OpenAI({
     baseURL: 'https://api.groq.com/openai/v1',
-    apiKey: process.env.GROQ_API_KEY,
+    apiKey,
   });
 
   const message = messages[0];
@@ -70,9 +49,9 @@ export async function POST(req: NextRequest) {
   while (attempts < MAX_RETRIES) {
     try {
       const content = await getCompletion(groq2, message);
-      const parsedContent = JSON.parse(content);
+      const parsedContent = JSON.parse(content || ''); // Handle null by providing a default value
       dateRangeSchema.parse(parsedContent);
-      console.log(parsedContent)
+      // console.log(parsedContent)
       return NextResponse.json(parsedContent);
     } catch (error) {
       attempts += 1;

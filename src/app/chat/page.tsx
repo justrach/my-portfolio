@@ -34,7 +34,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useUIState<typeof AI>()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
-
+  const [typingIndex, setTypingIndex] = useState({});
   const { scrollY } = useViewportScroll()
   const scale = useTransform(scrollY, [0, 300], [1, 0.8])
 

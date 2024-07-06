@@ -178,7 +178,6 @@ export default function AdminDashboard() {
       toast({
         title: "Error",
         description: 'Failed to convert dates',
-        status: 'error'
       });
     }
   };
@@ -235,7 +234,6 @@ export default function AdminDashboard() {
       toast({
         title: "Success",
         description: "Data updated successfully.",
-        status: 'success'
       });
       reset();
       setSelectedItem(null);
@@ -244,7 +242,6 @@ export default function AdminDashboard() {
       toast({
         title: "Error",
         description: `Error updating data: ${err instanceof Error ? err.message : 'Unknown error'}`,
-        status: 'error'
       });
     } finally {
       setLoading(false);
@@ -284,7 +281,6 @@ export default function AdminDashboard() {
       toast({
         title: "Success",
         description: "Data deleted successfully.",
-        status: 'success'
       });
       setConfirmDelete(null);
     } catch (err) {
@@ -292,7 +288,6 @@ export default function AdminDashboard() {
       toast({
         title: "Error",
         description: `Error deleting data: ${err instanceof Error ? err.message : 'Unknown error'}`,
-        status: 'error'
       });
       setConfirmDelete(null);
     }
