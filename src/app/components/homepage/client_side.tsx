@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AccentryComponent from "@/src/app/components/homepage/wordTopLevel";
-import { Thread } from "@/src/app/components/ui/assistant-ui/thread";
 import ChatPage from "../../chat/page";
 
 export default function HomeClient() {

@@ -13,6 +13,7 @@ import { eq, sql } from 'drizzle-orm';
 import { generateText } from "ai";
 import { PortfolioData, PortfolioOverview } from "@/components/client/overview";
 import { projects, skills, education, thoughts, workExperience, personalInfo } from '@/db/schema';
+import { CardComponent } from "./components/ui/acc_ui/Card";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const groq = createOpenAI({
   baseURL: 'https://api.groq.com/openai/v1',
@@ -145,63 +146,96 @@ export async function continueConversation(
       
             const { embedding: _, ...projectWithoutEmbedding } = project;
       
-            const prompt = `
-              You are an AI assistant describing a project in an engaging and informative way. 
-              Highlight the key aspects, technologies used, and any interesting features.
-              
-              Describe this project using proper Markdown format. Ensure you use Markdown syntax correctly for headers, lists, and links.
-      
-              Here's the project data:
-              ${JSON.stringify(projectWithoutEmbedding)}
-      
-              Your response MUST be in this exact Markdown format:
-      
-              # [Project Title]<Bold it>
-      
-              [A brief, engaging introduction to the project]
-      
-              ## Key Features
-      
-              - [Feature 1]
-              - [Feature 2]
-              - [Feature 3]
-      
-              ## Technologies Used
-      
-              - [Technology 1]
-              - [Technology 2]
-              - [Technology 3]
-      
-              ## Project Details<Bold>
-      
-              [More detailed description of the project, its goals, and implementation. Use proper Markdown formatting for any subheaders, lists, or emphasis needed.]
-      
-              ## Links
-      
-              - [GitHub](GitHub link if available)
-              - [Live Demo](Live demo link if available)
-      
-              Make sure to replace the placeholders with actual content from the project data. Use proper Markdown syntax throughout, including for links.
-            `;
-      
-            yield <div>Generating project description...</div>;
-      
-            const { text: projectMarkdown } = await generateText({
-              model: model,
-              prompt: prompt,
-            });
-      
-            return (
-              <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
-                <ReactMarkdown>{projectMarkdown}</ReactMarkdown>
-              </div>
-            );
+            return <CardComponent data={projectWithoutEmbedding} />;
           } catch (error) {
             console.error('Error fetching project:', error);
             return <div>Sorry, an error occurred while retrieving the project information.</div>;
           }
         },
       },
+      // getProject: {
+      //   description: "Get information about a specific project",
+      //   parameters: z.object({
+      //     projectName: z.string().describe("The name or description of the project to retrieve information about"),
+      //   }),
+      //   generate: async function* ({ projectName }) {
+      //     yield <div>Searching for project: {projectName}...</div>;
+      //     try {
+      //       let project;
+      
+      //       // First, try to fetch the project directly by name
+      //       const directResult = await db.select().from(schema.projects).where(sql`lower(title) = ${projectName.toLowerCase()}`).limit(1);
+      
+      //       if (directResult.length > 0) {
+      //         project = directResult[0];
+      //       } else {
+      //         // If no exact match, fall back to embedding search
+      //         project = await fetchEntityData(projectName, 'projects');
+      //       }
+      
+      //       if (!project) {
+      //         return <div>Sorry, I couldn&apos;t find a project matching &quot;{projectName}&quot;.</div>;
+      //       }
+      
+      //       const { embedding: _, ...projectWithoutEmbedding } = project;
+      
+      //       const prompt = `
+      //         You are an AI assistant describing a project in an engaging and informative way. 
+      //         Highlight the key aspects, technologies used, and any interesting features.
+              
+      //         Describe this project using proper Markdown format. Ensure you use Markdown syntax correctly for headers, lists, and links.
+      
+      //         Here's the project data:
+      //         ${JSON.stringify(projectWithoutEmbedding)}
+      
+      //         Your response MUST be in this exact Markdown format:
+      
+      //         # [Project Title]<Bold it>
+      
+      //         [A brief, engaging introduction to the project]
+      
+      //         ## Key Features
+      
+      //         - [Feature 1]
+      //         - [Feature 2]
+      //         - [Feature 3]
+      
+      //         ## Technologies Used
+      
+      //         - [Technology 1]
+      //         - [Technology 2]
+      //         - [Technology 3]
+      
+      //         ## Project Details<Bold>
+      
+      //         [More detailed description of the project, its goals, and implementation. Use proper Markdown formatting for any subheaders, lists, or emphasis needed.]
+      
+      //         ## Links
+      
+      //         - [GitHub](GitHub link if available)
+      //         - [Live Demo](Live demo link if available)
+      
+      //         Make sure to replace the placeholders with actual content from the project data. Use proper Markdown syntax throughout, including for links.
+      //       `;
+      
+      //       yield <div>Generating project description...</div>;
+      
+      //       const { text: projectMarkdown } = await generateText({
+      //         model: model,
+      //         prompt: prompt,
+      //       });
+      
+      //       return (
+      //         <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
+      //           <ReactMarkdown>{projectMarkdown}</ReactMarkdown>
+      //         </div>
+      //       );
+      //     } catch (error) {
+      //       console.error('Error fetching project:', error);
+      //       return <div>Sorry, an error occurred while retrieving the project information.</div>;
+      //     }
+      //   },
+      // },
       getSkill: {
         description: "Get information about a specific skill",
         parameters: z.object({
