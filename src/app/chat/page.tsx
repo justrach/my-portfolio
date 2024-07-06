@@ -4,8 +4,11 @@ import { useActions, useUIState } from 'ai/rsc'
 import ReactMarkdown from 'react-markdown'
 import { AI } from '../actions'
 import { FiSend } from 'react-icons/fi'
-import { motion } from 'framer-motion'
+import { motion, useViewportScroll, useTransform } from 'framer-motion'
 import { Button } from '@/components/ui/button'
+import { FlipWords } from '../components/ui/flip_words'
+import { words } from '../components/homepage/wordTopLevel'
+import { PlaceholdersAndVanishInput } from '../components/ui/acc_ui/newInput'
 
 const exampleMessages = [
   {
@@ -32,7 +35,10 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const { scrollY } = useViewportScroll()
+  const scale = useTransform(scrollY, [0, 300], [1, 0.8])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     await sendMessage(inputValue)
   }
@@ -82,9 +88,10 @@ export default function ChatPage() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5 }}
+              style={{ scale }}
             >
-              <h1 className="text-4xl font-bold text-gray-800 mb-4">Welcome to the AI Chatbot</h1>
-              <p className="text-xl text-gray-600 mb-8">How can I assist you today?</p>
+              <h1 className="text-4xl font-bold text-gray-800 mb-4">Welcome, I am<FlipWords words={words}/>  </h1>
+              <p className="text-xl text-gray-600 mb-8">What would you like to know about me?</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {exampleMessages.map((example, index) => (
                   <Button
@@ -92,8 +99,10 @@ export default function ChatPage() {
                     onClick={() => sendMessage(example.message)}
                     className="p-4 h-auto text-left"
                   >
-                    <h3 className="font-semibold">{example.heading}</h3>
-                    <p className="text-sm text-gray-500">{example.subheading}</p>
+                    <div>
+                      <h3 className="font-semibold">{example.heading}</h3>
+                      <p className="text-sm text-gray-500 mt-1 text-center">{example.subheading}</p>
+                    </div>
                   </Button>
                 ))}
               </div>
@@ -109,14 +118,14 @@ export default function ChatPage() {
             >
               <div className={`max-w-[70%] ${message.role === 'user' ? 'order-2' : 'order-1'}`}>
                 {message.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mb-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-white font-bold mb-2">
                     R
                   </div>
                 )}
                 <div
                   className={`p-4 rounded-lg ${
                     message.role === 'user'
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-gray-200 text-gray-800 shadow'
                       : 'bg-white text-gray-800 shadow'
                   }`}
                 >
@@ -133,18 +142,15 @@ export default function ChatPage() {
         </motion.div>
       </div>
       <div className="bg-white border-t border-gray-200 p-4">
-        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto flex items-center">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            className="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <Button type="submit" className="rounded-l-none">
-            <FiSend className="mr-2" />
-            Send
-          </Button>
-        </form>
+        <PlaceholdersAndVanishInput
+          placeholders={[
+            "Ask me anything...",
+            "What can I help you with?",
+            "Have a question? Ask away!"
+          ]}
+          onChange={(e) => setInputValue(e.target.value)}
+          onSubmit={handleSubmit}
+        />
       </div>
     </div>
   )

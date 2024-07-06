@@ -12,7 +12,7 @@ import * as schema from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { generateText } from "ai";
 import { PortfolioData, PortfolioOverview } from "@/components/client/overview";
-
+import { projects, skills, education, thoughts, workExperience, personalInfo } from '@/db/schema';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const groq = createOpenAI({
   baseURL: 'https://api.groq.com/openai/v1',
@@ -30,12 +30,12 @@ export interface ClientMessage {
   role: "user" | "assistant";
   display: ReactNode;
 }
-async function fetchAllData(tableName: string) {
+async function fetchAllData<T>(tableName: string): Promise<T[]> {
   try {
     const result = await db.execute(sql`
       SELECT * FROM ${sql.identifier(tableName)}
     `);
-    return result.rows;
+    return result.rows as T[];
   } catch (error) {
     console.error(`Error fetching ${tableName} data:`, error);
     return [];
@@ -97,115 +97,111 @@ export async function continueConversation(
       return <div>{content}</div>;
     },
     tools: {
-        getPortfolioOverview: {
-          description: "Get a comprehensive overview of the entire portfolio",
-          parameters: z.object({}),
-          generate: async function* () {
-            yield <div>Generating portfolio overview...</div>;
-            try {
-              const data: PortfolioData = {
-                projects: await fetchAllData('projects'),
-                skills: await fetchAllData('skills'),
-                education: await fetchAllData('education'),
-                thoughts: await fetchAllData('thoughts'),
-                workExperience: await fetchAllData('work_experience'),
-                personalInfo: await fetchAllData('personal_info'),
-              };
-  
-              return <PortfolioOverview data={data} />;
-            } catch (error) {
-              console.error('Error generating portfolio overview:', error);
-              return <div>Sorry, an error occurred while generating the portfolio overview.</div>;
-            }
-          },
+      getPortfolioOverview: {
+        description: "Get a comprehensive overview of the entire portfolio",
+        parameters: z.object({}),
+        generate: async function* () {
+          yield <div>Generating portfolio overview...</div>;
+          try {
+            const data: PortfolioData = {
+              projects: await fetchAllData('projects'),
+              skills: await fetchAllData('skills'),
+              education: await fetchAllData('education'),
+              thoughts: await fetchAllData('thoughts'),
+              workExperience: await fetchAllData('work_experience'),
+              personalInfo: await fetchAllData('personal_info'),
+            };
+    
+            return <PortfolioOverview data={data} />;
+          } catch (error) {
+            console.error('Error generating portfolio overview:', error);
+            return <div>Sorry, an error occurred while generating the portfolio overview.</div>;
+          }
         },
-        getProject: {
-          description: "Get information about a specific project",
-          parameters: z.object({
-            projectName: z.string().describe("The name or description of the project to retrieve information about"),
-          }),
-          generate: async function* ({ projectName }) {
-            yield <div>Searching for project: {projectName}...</div>;
-            try {
-              let project;
-        
-              // First, try to fetch the project directly by name
-              const directResult = await db.execute(sql`
-                SELECT * FROM projects
-                WHERE title = ${projectName}
-                LIMIT 1
-              `);
-        
-              if (directResult.rows.length > 0) {
-                project = directResult.rows[0];
-              } else {
-                // If no exact match, fall back to embedding search
-                project = await fetchEntityData(projectName, 'projects');
-              }
-        
-              if (!project) {
-                return <div>Sorry, I couldn't find a project matching "{projectName}".</div>;
-              }
-        
-              const { embedding: _, ...projectWithoutEmbedding } = project;
-        
-              const prompt = `
-                You are an AI assistant describing a project in an engaging and informative way. 
-                Highlight the key aspects, technologies used, and any interesting features.
-                
-                Describe this project using proper Markdown format. Ensure you use Markdown syntax correctly for headers, lists, and links.
-        
-                Here's the project data:
-                ${JSON.stringify(projectWithoutEmbedding)}
-        
-                Your response MUST be in this exact Markdown format:
-        
-                # [Project Title]<Bold it>
-        
-                [A brief, engaging introduction to the project]
-        
-                ## Key Features
-        
-                - [Feature 1]
-                - [Feature 2]
-                - [Feature 3]
-        
-                ## Technologies Used
-        
-                - [Technology 1]
-                - [Technology 2]
-                - [Technology 3]
-        
-                ## Project Details<Bold>
-        
-                [More detailed description of the project, its goals, and implementation. Use proper Markdown formatting for any subheaders, lists, or emphasis needed.]
-        
-                ## Links
-        
-                - [GitHub](GitHub link if available)
-                - [Live Demo](Live demo link if available)
-        
-                Make sure to replace the placeholders with actual content from the project data. Use proper Markdown syntax throughout, including for links.
-              `;
-        
-              yield <div>Generating project description...</div>;
-        
-              const { text: projectMarkdown } = await generateText({
-                model: model,
-                prompt: prompt,
-              });
-        
-              return (
-                <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
-                  <ReactMarkdown>{projectMarkdown}</ReactMarkdown>
-                </div>
-              );
-            } catch (error) {
-              console.error('Error fetching project:', error);
-              return <div>Sorry, an error occurred while retrieving the project information.</div>;
+      },
+      getProject: {
+        description: "Get information about a specific project",
+        parameters: z.object({
+          projectName: z.string().describe("The name or description of the project to retrieve information about"),
+        }),
+        generate: async function* ({ projectName }) {
+          yield <div>Searching for project: {projectName}...</div>;
+          try {
+            let project;
+      
+            // First, try to fetch the project directly by name
+            const directResult = await db.select().from(schema.projects).where(sql`lower(title) = ${projectName.toLowerCase()}`).limit(1);
+      
+            if (directResult.length > 0) {
+              project = directResult[0];
+            } else {
+              // If no exact match, fall back to embedding search
+              project = await fetchEntityData(projectName, 'projects');
             }
-          },
+      
+            if (!project) {
+              return <div>Sorry, I couldn&apos;t find a project matching &quot;{projectName}&quot;.</div>;
+            }
+      
+            const { embedding: _, ...projectWithoutEmbedding } = project;
+      
+            const prompt = `
+              You are an AI assistant describing a project in an engaging and informative way. 
+              Highlight the key aspects, technologies used, and any interesting features.
+              
+              Describe this project using proper Markdown format. Ensure you use Markdown syntax correctly for headers, lists, and links.
+      
+              Here's the project data:
+              ${JSON.stringify(projectWithoutEmbedding)}
+      
+              Your response MUST be in this exact Markdown format:
+      
+              # [Project Title]<Bold it>
+      
+              [A brief, engaging introduction to the project]
+      
+              ## Key Features
+      
+              - [Feature 1]
+              - [Feature 2]
+              - [Feature 3]
+      
+              ## Technologies Used
+      
+              - [Technology 1]
+              - [Technology 2]
+              - [Technology 3]
+      
+              ## Project Details<Bold>
+      
+              [More detailed description of the project, its goals, and implementation. Use proper Markdown formatting for any subheaders, lists, or emphasis needed.]
+      
+              ## Links
+      
+              - [GitHub](GitHub link if available)
+              - [Live Demo](Live demo link if available)
+      
+              Make sure to replace the placeholders with actual content from the project data. Use proper Markdown syntax throughout, including for links.
+            `;
+      
+            yield <div>Generating project description...</div>;
+      
+            const { text: projectMarkdown } = await generateText({
+              model: model,
+              prompt: prompt,
+            });
+      
+            return (
+              <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
+                <ReactMarkdown>{projectMarkdown}</ReactMarkdown>
+              </div>
+            );
+          } catch (error) {
+            console.error('Error fetching project:', error);
+            return <div>Sorry, an error occurred while retrieving the project information.</div>;
+          }
         },
+      },
       getSkill: {
         description: "Get information about a specific skill",
         parameters: z.object({
@@ -214,46 +210,57 @@ export async function continueConversation(
         generate: async function* ({ skillName }) {
           yield <div>Searching for skill: {skillName}...</div>;
           try {
-            const skill = await fetchEntityData(skillName, 'skills');
-            if (!skill) {
-              return <div>Sorry, I couldn't find a skill matching "{skillName}".</div>;
+            let skill;
+    
+            // First, try to fetch the skill directly by name
+            const directResult = await db.select().from(schema.skills).where(sql`lower(name) = ${skillName.toLowerCase()}`).limit(1);
+    
+            if (directResult.length > 0) {
+              skill = directResult[0];
+            } else {
+              // If no exact match, fall back to embedding search
+              skill = await fetchEntityData(skillName, 'skills');
             }
-
+    
+            if (!skill) {
+              return <div>Sorry, I couldn&apos;t find a skill matching &quot;{skillName}&quot;.</div>;
+            }
+    
             const { embedding: _, ...skillWithoutEmbedding } = skill;
-
+    
             const prompt = `
               You are an AI assistant describing a skill in an engaging and informative way. 
               Highlight the key aspects of the skill, its category, and proficiency level.
               
               Describe this skill in a natural, engaging way using pure markdown format:
-
+    
               Here's the skill data:
               ${JSON.stringify(skillWithoutEmbedding)}
-
+    
               Your response should be in this format:
               # [Skill Name]
-
+    
               [A brief, engaging introduction to the skill]
-
+    
               ## Category
               [Skill category]
-
+    
               ## Proficiency Level
               [Proficiency level out of 5]
-
+    
               ## Details
               [More detailed description of the skill, its applications, and importance]
-
+    
               Make sure to replace the placeholders with actual content from the skill data.
             `;
-
+    
             yield <div>Generating skill description...</div>;
-
+    
             const { text: skillMarkdown } = await generateText({
               model: model,
               prompt: prompt,
             });
-
+    
             return (
               <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
                 <ReactMarkdown>{skillMarkdown}</ReactMarkdown>
@@ -273,49 +280,60 @@ export async function continueConversation(
         generate: async function* ({ educationQuery }) {
           yield <div>Searching for education: {educationQuery}...</div>;
           try {
-            const education = await fetchEntityData(educationQuery, 'education');
-            if (!education) {
-              return <div>Sorry, I couldn't find education information matching "{educationQuery}".</div>;
+            let education;
+    
+            // First, try to fetch the education directly by institution or degree
+            const directResult = await db.select().from(schema.education).where(sql`lower(institution) = ${educationQuery.toLowerCase()} OR lower(degree) = ${educationQuery.toLowerCase()}`).limit(1);
+    
+            if (directResult.length > 0) {
+              education = directResult[0];
+            } else {
+              // If no exact match, fall back to embedding search
+              education = await fetchEntityData(educationQuery, 'education');
             }
-
+    
+            if (!education) {
+              return <div>Sorry, I couldn&apos;t find education information matching &quot;{educationQuery}&quot;.</div>;
+            }
+    
             const { embedding: _, ...educationWithoutEmbedding } = education;
-
+    
             const prompt = `
               You are an AI assistant describing educational background in an engaging and informative way. 
               Highlight the key aspects of the education, including the institution, degree, and field of study.
               
               Describe this education in a natural, engaging way using pure markdown format:
-
+    
               Here's the education data:
               ${JSON.stringify(educationWithoutEmbedding)}
-
+    
               Your response should be in this format:
               # [Institution Name]
-
+    
               [A brief, engaging introduction to the educational experience]
-
+    
               ## Degree
               [Degree name]
-
+    
               ## Field of Study
               [Field of study]
-
+    
               ## Duration
               [Start date] - [End date]
-
+    
               ## Details
               [More detailed description of the education, including key achievements, projects, or experiences]
-
+    
               Make sure to replace the placeholders with actual content from the education data.
             `;
-
+    
             yield <div>Generating education description...</div>;
-
+    
             const { text: educationMarkdown } = await generateText({
               model: model,
               prompt: prompt,
             });
-
+    
             return (
               <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
                 <ReactMarkdown>{educationMarkdown}</ReactMarkdown>
@@ -335,47 +353,58 @@ export async function continueConversation(
         generate: async function* ({ thoughtQuery }) {
           yield <div>Searching for thought: {thoughtQuery}...</div>;
           try {
-            const thought = await fetchEntityData(thoughtQuery, 'thoughts');
-            if (!thought) {
-              return <div>Sorry, I couldn't find a thought matching "{thoughtQuery}".</div>;
+            let thought;
+    
+            // First, try to fetch the thought directly by topic
+            const directResult = await db.select().from(schema.thoughts).where(sql`lower(topic) = ${thoughtQuery.toLowerCase()}`).limit(1);
+    
+            if (directResult.length > 0) {
+              thought = directResult[0];
+            } else {
+              // If no exact match, fall back to embedding search
+              thought = await fetchEntityData(thoughtQuery, 'thoughts');
             }
-
+    
+            if (!thought) {
+              return <div>Sorry, I couldn&apos;t find a thought matching &quot;{thoughtQuery}&quot;.</div>;
+            }
+    
             const { embedding: _, ...thoughtWithoutEmbedding } = thought;
-
+    
             const prompt = `
               You are an AI assistant presenting a thought or blog post in an engaging and informative way. 
               Highlight the key aspects of the thought, including the topic and main ideas.
               
               Present this thought in a natural, engaging way using pure markdown format:
-
+    
               Here's the thought data:
               ${JSON.stringify(thoughtWithoutEmbedding)}
-
+    
               Your response should be in this format:
               # [Thought Topic]
-
+    
               [Date added]
-
+    
               [A brief, engaging introduction to the thought]
-
+    
               ## Key Points
               - [Key point 1]
               - [Key point 2]
               - [Key point 3]
-
+    
               ## Details
               [More detailed exposition of the thought, including any arguments, examples, or insights]
-
+    
               Make sure to replace the placeholders with actual content from the thought data.
             `;
-
+    
             yield <div>Generating thought presentation...</div>;
-
+    
             const { text: thoughtMarkdown } = await generateText({
               model: model,
               prompt: prompt,
             });
-
+    
             return (
               <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
                 <ReactMarkdown>{thoughtMarkdown}</ReactMarkdown>
@@ -395,52 +424,61 @@ export async function continueConversation(
         generate: async function* ({ workQuery }) {
           yield <div>Searching for work experience: {workQuery}...</div>;
           try {
-            const experience = await fetchEntityData(workQuery, 'work_experience');
-            if (!experience) {
-              return <div>Sorry, I couldn't find work experience matching "{workQuery}".</div>;
+            let experience;
+    
+            // First, try to fetch the work experience directly by company or position
+            const directResult = await db.select().from(schema.workExperience).where(sql`lower(company) = ${workQuery.toLowerCase()} OR lower(position) = ${workQuery.toLowerCase()}`).limit(1);
+    
+            if (directResult.length > 0) {
+              experience = directResult[0];
+            } else {
+              // If no exact match, fall back to embedding search
+              experience = await fetchEntityData(workQuery, 'work_experience');
             }
-
+    
+            if (!experience) {
+              return <div>Sorry, I couldn&apos;t find work experience matching &quot;{workQuery}&quot;.</div>;
+            }
+    
             const { embedding: _, ...experienceWithoutEmbedding } = experience;
-
+    
             const prompt = `
               You are an AI assistant describing work experience in an engaging and informative way. 
               Highlight the key aspects of the work experience, including the company, position, and responsibilities.
               
               Describe this work experience in a natural, engaging way using pure markdown format:
-
+    
               Here's the work experience data:
               ${JSON.stringify(experienceWithoutEmbedding)}
-
+    
               Your response should be in this format:
               # [Company Name] - [Position]
-
+    
               [A brief, engaging introduction to the work experience]
-
+    
               ## Duration
               [Start date] - [End date]
-
+    
               ## Key Responsibilities
               - [Responsibility 1]
               - [Responsibility 2]
               - [Responsibility 3]
-
+    
               ## Achievements
               [List of key achievements or projects completed during this role]
-
+    
               ## Skills Developed
               [List of skills developed or enhanced in this role]
-
+    
               Make sure to replace the placeholders with actual content from the work experience data.
             `;
-
+    
             yield <div>Generating work experience description...</div>;
-
+    
             const { text: experienceMarkdown } = await generateText({
               model: model,
               prompt: prompt,
-            });
-
-            return (
+            });return (
               <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
                 <ReactMarkdown>{experienceMarkdown}</ReactMarkdown>
               </div>
@@ -459,46 +497,57 @@ export async function continueConversation(
         generate: async function* ({ infoQuery }) {
           yield <div>Retrieving personal information: {infoQuery}...</div>;
           try {
-            const personalInfo = await fetchEntityData(infoQuery, 'personal_info');
-            if (!personalInfo) {
-              return <div>Sorry, I couldn't find personal information matching "{infoQuery}".</div>;
+            let personalInfo;
+    
+            // First, try to fetch the personal info directly by full name
+            const directResult = await db.select().from(schema.personalInfo).where(sql`lower(full_name) = ${infoQuery.toLowerCase()}`).limit(1);
+    
+            if (directResult.length > 0) {
+              personalInfo = directResult[0];
+            } else {
+              // If no exact match, fall back to embedding search
+              personalInfo = await fetchEntityData(infoQuery, 'personal_info');
             }
-
+    
+            if (!personalInfo) {
+              return <div>Sorry, I couldn&apos;t find personal information matching &quot;{infoQuery}&quot;.</div>;
+            }
+    
             const { embedding: _, ...infoWithoutEmbedding } = personalInfo;
-
+    
             const prompt = `
               You are an AI assistant presenting personal information in a professional and engaging way. 
               Present the information while maintaining appropriate privacy and professionalism.
               
               Present this personal information in a natural, engaging way using pure markdown format:
-
+    
               Here's the personal information data:
               ${JSON.stringify(infoWithoutEmbedding)}
-
+    
               Your response should be in this format:
               # Personal Profile
-
+    
               [A brief, professional introduction]
-
+    
               ## Contact Information
               - Email: [Email address]
               - Phone: [Phone number]
               - Location: [Location]
-
+    
               ## Professional Summary
               [A concise professional summary based on the bio]
-
+    
               Make sure to replace the placeholders with actual content from the personal information data.
               Do not include any sensitive or private information in the response.
             `;
-
+    
             yield <div>Generating personal information presentation...</div>;
-
+    
             const { text: infoMarkdown } = await generateText({
               model: model,
               prompt: prompt,
             });
-
+    
             return (
               <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
                 <ReactMarkdown>{infoMarkdown}</ReactMarkdown>
@@ -519,7 +568,6 @@ export async function continueConversation(
     display: result.value,
   };
 }
-
 
 export const AI = createAI<ServerMessage[], ClientMessage[]>({
   actions: {

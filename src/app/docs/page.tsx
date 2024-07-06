@@ -53,8 +53,8 @@ export default defineConfig({
           <h2 className="text-xl font-semibold mb-2">Set up database connection</h2>
           <p>Create a file named <code>db/index.ts</code>:</p>
           <CodeBlock>
-            {`import { drizzle } from 'drizzle-orm/neon-http';
-import { neon, neonConfig } from '@neondatabase/serverless';
+            {`import { drizzle } from "drizzle-orm/neon-http";
+import { neon, neonConfig } from "@neondatabase/serverless";
 
 neonConfig.fetchConnectionCache = true;
 
@@ -65,7 +65,7 @@ export const db = drizzle(sql);`}
 
         <li>
           <h2 className="text-xl font-semibold mb-2">Define your schema</h2>
-          <p>Create a file named <code>db/schema.ts</code> and define your database schema using Drizzle's syntax.</p>
+          <p>Create a file named <code>db/schema.ts</code> and define your database schema using Drizzle&#39;s syntax.</p>
         </li>
 
         <li>

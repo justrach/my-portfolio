@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AccentryComponent from "@/src/app/components/homepage/wordTopLevel";
 import { Thread } from "@/src/app/components/ui/assistant-ui/thread";
+import ChatPage from "../../chat/page";
 
 export default function HomeClient() {
   const [showThread, setShowThread] = useState(false);
@@ -25,7 +26,7 @@ export default function HomeClient() {
           transition={{ duration: 1 }}
           className="absolute top-0 left-0 w-full h-full"
         >
-          <Thread />
+          <ChatPage />
         </motion.div>
       )}
     </main>
