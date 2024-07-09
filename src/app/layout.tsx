@@ -4,6 +4,7 @@ import { MyRuntimeProvider } from "@/src/app/MyRuntimeProvider";
 import { cn } from "@/src/app/lib/utils";
 import "./globals.css";
 import { AI } from "./actions";
+import { ThemeProvider } from "@/components/theme_provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +22,14 @@ export default function RootLayout({
     <AI>
     {/* <MyRuntimeProvider> */}
       <html lang="en" className="h-full">
+      <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
         <body className={cn(inter.className, "h-full")}>{children}</body>
+        </ThemeProvider>
       </html>
     {/* </MyRuntimeProvider> */}
     </AI>

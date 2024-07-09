@@ -16,6 +16,9 @@ import { projects, skills, education, thoughts, workExperience, personalInfo } f
 import { CardComponent } from "./components/ui/acc_ui/Card";
 import ProjectOverview from "./components/ui/project_overview";
 import { CodingLanguagesPieChart } from "@/components/client/codingLanguagesPieChart";
+import ProjectTimeline from "@/components/portfolio_overview/project_timeline";
+import ProjectOverviewSection from "@/components/portfolio_overview/project_overview";
+import LoadingAnimation from "@/components/portfolio_overview/loading";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const groq = createOpenAI({
   baseURL: 'https://api.groq.com/openai/v1',
@@ -30,7 +33,12 @@ interface Project {
   github_link?: string;
   live_demo_link?: string;
 }
-
+const pickProjectFields = (project: any) => ({
+  title: project.title,
+  short_description: project.short_description || project.shortDescription,
+  imageurl: project.image_url || project.imageurl,
+  start_date: project.start_date,
+});
 export interface ServerMessage {
   role: "user" | "assistant";
   content: string;
@@ -136,7 +144,7 @@ export async function continueConversation(
           projectName: z.string().describe("The name or description of the project to retrieve information about"),
         }),
         generate: async function* ({ projectName }) {
-          yield <div>Searching for project: {projectName}...</div>;
+          yield <div>Loading <LoadingAnimation></LoadingAnimation></div>;
           try {
             let project;
       
@@ -167,10 +175,11 @@ export async function continueConversation(
         description: "Get an overview of all projects",
         parameters: z.object({}),
         generate: async function* () {
-          yield <div>Generating project overview...</div>;
+          yield <div>Loading <LoadingAnimation></LoadingAnimation></div>;
           try {
             const projects = await fetchAllData<Project>('projects');
-            return <ProjectOverview projects={projects} />;
+            const formattedProjects = projects.map(pickProjectFields);
+            return <ProjectOverviewSection projects={formattedProjects} />;
           } catch (error) {
             console.error('Error generating project overview:', error);
             return <div>Sorry, an error occurred while generating the project overview.</div>;

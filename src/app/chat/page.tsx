@@ -77,7 +77,7 @@ export default function ChatPage() {
   }, [])
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
       <div ref={chatContainerRef} className="flex-grow overflow-auto p-4 sm:p-6">
         <motion.div 
           className="max-w-3xl mx-auto space-y-4 sm:space-y-6"
@@ -93,8 +93,12 @@ export default function ChatPage() {
               transition={{ duration: 0.5 }}
               style={{ scale }}
             >
-              <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">Welcome, I am<FlipWords words={words}/>  </h1>
-              <p className="text-lg sm:text-xl text-gray-600 mb-4 sm:mb-8">What would you like to know about me?</p>
+              <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 dark:text-gray-200 mb-2 sm:mb-4">
+                Welcome, I am <FlipWords words={words}/>  
+              </h1>
+              <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 mb-4 sm:mb-8">
+                What would you like to know about me?
+              </p>
             </motion.div>
           )}
           {messages.map((message, index) => (
@@ -114,8 +118,8 @@ export default function ChatPage() {
                 <div
                   className={`p-3 sm:p-4 rounded-lg text-sm sm:text-base ${
                     message.role === 'user'
-                      ? 'bg-gray-200 text-gray-800 shadow'
-                      : 'bg-white text-gray-800 shadow'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow'
+                      : 'bg-white dark:bg-black text-gray-800 dark:text-gray-200 shadow'
                   }`}
                 >
                   {typeof message.display === 'string' ? (
@@ -130,9 +134,9 @@ export default function ChatPage() {
           <div ref={messagesEndRef} />
         </motion.div>
       </div>
-      <div className="bg-white border-t border-gray-200 p-3 sm:p-4">
+      <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-3 sm:p-4">
         <div className="flex items-center justify-end space-x-2 mb-3">
-          <Label htmlFor="custom-input-mode" className="text-sm">Custom Input</Label>
+          <Label htmlFor="custom-input-mode" className="text-sm ">Custom Input</Label>
           <Switch
             id="custom-input-mode"
             checked={showCustomInput}
@@ -150,16 +154,16 @@ export default function ChatPage() {
             onSubmit={handleSubmit}
           />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="overflow-x-auto sm:overflow-x-visible flex sm:grid sm:grid-cols-3 gap-3 scrollbar-hide">
             {exampleMessages.map((example, index) => (
               <Button
                 key={index}
                 onClick={() => sendMessage(example.message)}
-                className="p-2 h-auto text-center text-sm"
+                className="p-2 h-auto text-center text-sm min-w-[200px] sm:min-w-[auto]"
               >
                 <div>
-                  <h3 className="font-semibold">{example.heading}</h3>
-                  <p className="text-xs text-gray-500 mt-1">{example.subheading}</p>
+                  <h3 className="font-semibold ">{example.heading}</h3>
+                  <p className="text-xs  mt-1">{example.subheading}</p>
                 </div>
               </Button>
             ))}

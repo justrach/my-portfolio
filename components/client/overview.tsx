@@ -20,7 +20,7 @@ export interface PortfolioData {
   }>;
   projects: Array<{
     title: string;
-    shortDescription: string;
+    short_description: string;
     imageurl: string;
     start_date: string;
   }>;
