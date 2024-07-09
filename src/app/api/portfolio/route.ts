@@ -76,7 +76,8 @@ export async function POST(request: NextRequest) {
     let newEntry;
     switch (entity) {
       case 'projects':
-        if (data.technologies) {
+        // Ensure technologies is an array
+        if (typeof data.technologies === 'string') {
           data.technologies = data.technologies.split(',').map((tech: string) => tech.trim());
         }
         newEntry = await db.insert(schema.projects).values(data).returning();

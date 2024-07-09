@@ -11,6 +11,7 @@ export const projects = pgTable('projects', {
   endDate: date('end_date'),
   githubLink: varchar('github_link', { length: 255 }),
   liveLink: varchar('live_link', { length: 255 }),
+  imageurl : varchar('imageurl', { length: 255 }),
   embedding: vector('embedding', { dimensions: 1536 }),
 });
 

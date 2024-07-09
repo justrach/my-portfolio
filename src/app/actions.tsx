@@ -21,7 +21,7 @@ const groq = createOpenAI({
   baseURL: 'https://api.groq.com/openai/v1',
   apiKey: process.env.GROQ_API_KEY,
 });
-const model = groq('llama3-70b-8192');
+const model = groq('llama3-8b-8192');
 interface Project {
   id: string;
   title: string;

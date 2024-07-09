@@ -97,11 +97,11 @@ export default function ChatPage() {
                   <Button
                     key={index}
                     onClick={() => sendMessage(example.message)}
-                    className="p-4 h-auto text-left"
+                    className="p-4 h-auto text-center"
                   >
                     <div>
                       <h3 className="font-semibold">{example.heading}</h3>
-                      <p className="text-sm text-gray-500 mt-1 text-center">{example.subheading}</p>
+                      <p className="text-sm text-gray-500 mt-1">{example.subheading}</p>
                     </div>
                   </Button>
                 ))}
