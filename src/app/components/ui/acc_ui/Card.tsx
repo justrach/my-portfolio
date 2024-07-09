@@ -18,11 +18,20 @@ interface CardComponentProps {
     [key: string]: any;
   };
 }
+interface CustomWindow extends Window {
+  twttr?: {
+    widgets: {
+      load: () => void;
+    };
+  };
+}
 
+declare var window: CustomWindow;
 export const CardComponent: React.FC<CardComponentProps> = ({ data }) => {
   const [enhancedDescription, setEnhancedDescription] = useState<string | null>(null);
   const [enhancedDuration, setEnhancedDuration] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [twitterLoading, setTwitterLoading] = useState<boolean>(true);
   const [twitterEmbedHtml, setTwitterEmbedHtml] = useState<string | null>(null);
 
   useEffect(() => {
@@ -54,6 +63,8 @@ export const CardComponent: React.FC<CardComponentProps> = ({ data }) => {
         setTwitterEmbedHtml(response.data.html);
       } catch (error) {
         console.error("Error fetching Twitter embed:", error);
+      } finally {
+        setTwitterLoading(false);
       }
     };
 
@@ -67,6 +78,8 @@ export const CardComponent: React.FC<CardComponentProps> = ({ data }) => {
       }
       if (data.liveLink && (data.liveLink.includes('x.com') || data.liveLink.includes('twitter.com'))) {
         await fetchTwitterEmbed(data.liveLink);
+      } else {
+        setTwitterLoading(false);
       }
       setLoading(false);
     };
@@ -76,9 +89,9 @@ export const CardComponent: React.FC<CardComponentProps> = ({ data }) => {
 
   useEffect(() => {
     if (twitterEmbedHtml) {
-      if (window.twttr) {
+      if (typeof window !== 'undefined' && twitterEmbedHtml && window.twttr) {
         window.twttr.widgets.load();
-      } else {
+        } else {
         const script = document.createElement('script');
         script.src = 'https://platform.twitter.com/widgets.js';
         script.async = true;
@@ -92,7 +105,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({ data }) => {
       return (
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
-            <AccordionTrigger>Read More</AccordionTrigger>
+            <AccordionTrigger>Want to read more?</AccordionTrigger>
             <AccordionContent>
               <ReactMarkdown>{description}</ReactMarkdown>
             </AccordionContent>
@@ -148,16 +161,14 @@ export const CardComponent: React.FC<CardComponentProps> = ({ data }) => {
       <CardContent>
         {enhancedDescription && (
           <div className="mb-4">
-            <h2 className="text-lg font-semibold capitalize mb-2">Description</h2>
+            <h2 className="text-lg font-semibold  mb-2">What is it?</h2>
+            {data.shortDescription}
             {renderDescription(enhancedDescription)}
           </div>
         )}
-        {Object.entries(data).map(([key, value]) => {
-          if (['id', 'title', 'summary', 'github_link', 'liveLink', 'technologies', 'longDescription', 'startDate', 'endDate'].includes(key)) return null;
+        {/* {Object.entries(data).map(([key, value]) => {
+          if (['id', 'title', 'summary', 'liveLink', 'technologies', 'longDescription', 'startDate', 'endDate'].includes(key)) return null;
           if (typeof value === 'string' || typeof value === 'number') {
-            if (key.toLowerCase() === 'livelink') {
-              return renderLiveLink(value.toString());
-            }
             return (
               <div key={key} className="mb-4">
                 <h2 className="text-lg font-semibold capitalize mb-2">{key.replace(/_/g, ' ')}</h2>
@@ -178,14 +189,14 @@ export const CardComponent: React.FC<CardComponentProps> = ({ data }) => {
             );
           }
           return null;
-        })}
+        })} */}
         {enhancedDuration && (
           <div className="mb-4">
             <h2 className="text-lg font-semibold capitalize mb-2">Duration</h2>
             <p>{enhancedDuration}</p>
           </div>
         )}
-                  {data.liveLink && renderLiveLink(data.liveLink)}
+        {data.liveLink && renderLiveLink(data.liveLink)}
         {data.technologies && data.technologies.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-4">
             {data.technologies.map((tech: string, index: number) => {
@@ -197,17 +208,16 @@ export const CardComponent: React.FC<CardComponentProps> = ({ data }) => {
             })}
           </div>
         )}
-        <div className="flex justify-end gap-2 mt-4">
-          {data.github_link && (
+        {data.github_link && (
+          <div className="flex justify-end gap-2 mt-4">
             <Button variant="outline" size="sm" asChild>
               <a href={data.github_link} target="_blank" rel="noopener noreferrer">
                 <Github className="mr-2 h-4 w-4" />
                 GitHub
               </a>
             </Button>
-          )}
-
-        </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

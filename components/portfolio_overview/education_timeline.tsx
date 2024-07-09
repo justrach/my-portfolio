@@ -57,9 +57,9 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({ education }) => {
   };
 
   return (
-    <div className="relative w-full" ref={timelineRef}>
+    <div className="relative w-full px-4 sm:px-0" ref={timelineRef}>
       <motion.div
-        className="absolute left-1/2 transform -translate-x-1/2 top-0 w-0.5 bg-green-300 origin-top"
+        className="absolute left-4 sm:left-1/2 transform sm:-translate-x-1/2 top-0 w-0.5 bg-green-300 origin-top"
         style={{ height: timelineHeight }}
         initial={{ scaleY: 0 }}
         animate={controls}
@@ -72,12 +72,12 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({ education }) => {
       {education.map((edu, index) => {
         const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
         const itemControls = useAnimation();
-
+        
         useEffect(() => {
           if (inView) {
             const timer = setTimeout(() => {
               itemControls.start({ opacity: 1, y: 0, transition: { duration: 1 } });
-            }, 1000); // 1-second delay before animation starts
+            }, 1000);
             return () => clearTimeout(timer);
           }
         }, [inView, itemControls]);
@@ -85,24 +85,26 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({ education }) => {
         return (
           <motion.div
             key={index}
-            className="flex items-center mb-12 relative opacity-0 transform -translate-y-4"
+            className="flex flex-col sm:flex-row items-start sm:items-center mb-12 relative opacity-0 transform -translate-y-4"
             ref={ref}
             animate={itemControls}
           >
-            <div className="w-1/2 text-right pr-8">
+            <div className="w-full sm:w-1/2 text-left sm:text-right pr-0 sm:pr-8 mb-4 sm:mb-0 order-2 sm:order-1">
               <h3 className="font-bold">{edu.institution}</h3>
               <p>{edu.degree}</p>
               <p>{formatYear(edu.start_date)} to {formatYear(edu.end_date)}</p>
             </div>
-            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center">
+            <div className="absolute left-0 sm:left-1/2 top-0 sm:top-1/2 transform sm:-translate-y-1/2 flex items-center justify-center">
               <motion.div
                 className="w-4 h-4 bg-green-400 rounded-full"
                 initial={{ scale: 0 }}
                 animate={pulseAnimation}
               />
             </div>
-            <div className="w-1/2 pl-8 flex items-center">
-              <Image src="/education.svg" alt="Education icon" width={128} height={128} />
+            <div className="w-full sm:w-1/2 pl-8 sm:pl-8 flex items-center order-1 sm:order-2 mb-4 sm:mb-0">
+              <div className="w-16 h-16 relative">
+                <Image src="/education.svg" alt="Education icon" layout="fill" objectFit="contain" />
+              </div>
             </div>
           </motion.div>
         );

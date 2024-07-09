@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import DatePicker from 'react-datepicker';
@@ -30,6 +30,9 @@ import {
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { motion, useAnimation, AnimationControls } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import Image from 'next/image';
 
 type EntityName = 'projects' | 'skills' | 'education' | 'thoughts' | 'workExperience' | 'personalInfo';
 
@@ -57,6 +60,7 @@ const formFields: Record<EntityName, { name: string; type: string; placeholder: 
     { name: 'githubLink', type: 'text', placeholder: 'GitHub Link' },
     { name: 'liveLink', type: 'text', placeholder: 'Live Link' },
     { name: 'imageurl', type: 'text', placeholder: 'Image URL' },
+    { name: 'label', type: 'text', placeholder: 'Label (hackathon, application, webApp)' },
   ],
   skills: [
     { name: 'name', type: 'text', placeholder: 'Skill Name' },

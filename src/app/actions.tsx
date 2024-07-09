@@ -190,89 +190,51 @@ export async function continueConversation(
           return <div>I'm sorry, but I don't have specific information about "{query}". Is there something else I can help you with regarding my projects or skills?</div>;
         },
       },
-      // getProject: {
-      //   description: "Get information about a specific project",
-      //   parameters: z.object({
-      //     projectName: z.string().describe("The name or description of the project to retrieve information about"),
-      //   }),
-      //   generate: async function* ({ projectName }) {
-      //     yield <div>Searching for project: {projectName}...</div>;
-      //     try {
-      //       let project;
-      
-      //       // First, try to fetch the project directly by name
-      //       const directResult = await db.select().from(schema.projects).where(sql`lower(title) = ${projectName.toLowerCase()}`).limit(1);
-      
-      //       if (directResult.length > 0) {
-      //         project = directResult[0];
-      //       } else {
-      //         // If no exact match, fall back to embedding search
-      //         project = await fetchEntityData(projectName, 'projects');
-      //       }
-      
-      //       if (!project) {
-      //         return <div>Sorry, I couldn&apos;t find a project matching &quot;{projectName}&quot;.</div>;
-      //       }
-      
-      //       const { embedding: _, ...projectWithoutEmbedding } = project;
-      
-      //       const prompt = `
-      //         You are an AI assistant describing a project in an engaging and informative way. 
-      //         Highlight the key aspects, technologies used, and any interesting features.
-              
-      //         Describe this project using proper Markdown format. Ensure you use Markdown syntax correctly for headers, lists, and links.
-      
-      //         Here's the project data:
-      //         ${JSON.stringify(projectWithoutEmbedding)}
-      
-      //         Your response MUST be in this exact Markdown format:
-      
-      //         # [Project Title]<Bold it>
-      
-      //         [A brief, engaging introduction to the project]
-      
-      //         ## Key Features
-      
-      //         - [Feature 1]
-      //         - [Feature 2]
-      //         - [Feature 3]
-      
-      //         ## Technologies Used
-      
-      //         - [Technology 1]
-      //         - [Technology 2]
-      //         - [Technology 3]
-      
-      //         ## Project Details<Bold>
-      
-      //         [More detailed description of the project, its goals, and implementation. Use proper Markdown formatting for any subheaders, lists, or emphasis needed.]
-      
-      //         ## Links
-      
-      //         - [GitHub](GitHub link if available)
-      //         - [Live Demo](Live demo link if available)
-      
-      //         Make sure to replace the placeholders with actual content from the project data. Use proper Markdown syntax throughout, including for links.
-      //       `;
-      
-      //       yield <div>Generating project description...</div>;
-      
-      //       const { text: projectMarkdown } = await generateText({
-      //         model: model,
-      //         prompt: prompt,
-      //       });
-      
-      //       return (
-      //         <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
-      //           <ReactMarkdown>{projectMarkdown}</ReactMarkdown>
-      //         </div>
-      //       );
-      //     } catch (error) {
-      //       console.error('Error fetching project:', error);
-      //       return <div>Sorry, an error occurred while retrieving the project information.</div>;
-      //     }
-      //   },
-      // },
+      generateFollowUpQuestions: {
+        description: "Generate follow-up questions based on the conversation context",
+        parameters: z.object({
+          context: z.string().describe("A brief summary of the current conversation context"),
+        }),
+        generate: async function* ({ context }) {
+          yield <div>Generating follow-up questions...</div>;
+          try {
+            const prompt = `
+              Based on the following conversation context, generate 3 relevant follow-up questions that a user might ask to learn more about Rach Pradhan's professional background, projects, or skills. These questions should be diverse and encourage further exploration of Rach's portfolio.
+
+              Context: ${context}
+
+              Generate the questions in the following format:
+              1. [First question]
+              2. [Second question]
+              3. [Third question]
+
+              Ensure the questions are specific, engaging, and relevant to the conversation context.
+            `;
+
+            const { text: questionsText } = await generateText({
+              model: model,
+              prompt: prompt,
+            });
+
+            const questions = questionsText.split('\n').filter(q => q.trim() !== '').map(q => q.replace(/^\d+\.\s*/, '').trim());
+
+            return (
+              <div>
+                <h3>Follow-up Questions:</h3>
+                <ul>
+                  {questions.map((question, index) => (
+                    <li key={index}>{question}</li>
+                  ))}
+                </ul>
+              </div>
+            );
+          } catch (error) {
+            console.error('Error generating follow-up questions:', error);
+            return <div>Sorry, an error occurred while generating follow-up questions.</div>;
+          }
+        },
+      },
+
       getSkill: {
         description: "Get information about a specific skill",
         parameters: z.object({

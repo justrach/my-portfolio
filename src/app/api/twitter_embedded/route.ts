@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     console.log('Twitter embed response:', response.data);
 
     return NextResponse.json(response.data);
-  } catch (error) {
+  } catch (error:any) {
     console.error('Error fetching Twitter embed:', error.response ? error.response.data : error.message);
     return NextResponse.json({ error: 'Error fetching Twitter embed' }, { status: error.response?.status || 500 });
   }
