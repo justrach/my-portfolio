@@ -15,6 +15,20 @@
       "when": 1720132539397,
       "tag": "0001_stale_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1720494329749,
+      "tag": "0002_first_doorman",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1720518257616,
+      "tag": "0003_chunky_barracuda",
+      "breakpoints": true
     }
   ]
 }

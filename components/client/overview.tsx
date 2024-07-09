@@ -1,13 +1,17 @@
-// File: components/PortfolioOverview.tsx
 'use client';
 
 import React, { useCallback } from 'react';
+import Image from 'next/image';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import EducationTimeline from '../portfolio_overview/education_timeline';
+import ProjectTimeline from '../portfolio_overview/project_timeline';
 
 export interface PortfolioData {
   personalInfo: Array<{
-    fullName: string;
+    full_name: string;
     email: string;
     location: string;
+    imageurl: string;
   }>;
   skills: Array<{
     name: string;
@@ -17,13 +21,15 @@ export interface PortfolioData {
   projects: Array<{
     title: string;
     shortDescription: string;
+    imageurl: string;
+    start_date: string;
   }>;
   education: Array<{
     institution: string;
     degree: string;
     fieldOfStudy: string;
-    startDate: string;
-    endDate: string;
+    start_date: string;
+    end_date: string;
   }>;
   workExperience: Array<{
     company: string;
@@ -52,10 +58,12 @@ const ClickableItem: React.FC<{ text: string; action: string }> = ({ text, actio
 );
 
 const OverviewSection: React.FC<{ title: string; content: React.ReactNode }> = ({ title, content }) => (
-  <div className="mb-4">
-    <h3 className="text-lg font-semibold mb-2">{title}</h3>
-    {content}
-  </div>
+  <Card className="mb-4">
+    <CardHeader>
+      <CardTitle>{title}</CardTitle>
+    </CardHeader>
+    <CardContent>{content}</CardContent>
+  </Card>
 );
 
 export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ data }) => {
@@ -73,10 +81,20 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ data }) =>
       <OverviewSection
         title="Personal Information"
         content={
-          <div>
-            <p><strong>Name:</strong> <ClickableItem text={data.personalInfo[0]?.fullName} action={`Tell me more about ${data.personalInfo[0]?.fullName}`} /></p>
-            <p><strong>Email:</strong> {data.personalInfo[0]?.email}</p>
-            <p><strong>Location:</strong> {data.personalInfo[0]?.location}</p>
+          <div className="flex flex-col items-center">
+            <div className="mb-4">
+              {/* <p>{Object.keys(data.personalInfo[0])}</p> */}
+              <p><strong>Name:</strong> <ClickableItem text={data.personalInfo[0]?.full_name} action={`Tell me more about ${data.personalInfo[0]?.full_name}`} /></p>
+              <p><strong>Email:</strong> {data.personalInfo[0]?.email}</p>
+              <p><strong>Location:</strong> {data.personalInfo[0]?.location}</p>
+            </div>
+            <Image 
+              src={data.personalInfo[0]?.imageurl}
+              alt="Personal Image"
+              width={150}
+              height={150}
+              className="rounded-full"
+            />
           </div>
         }
       />
@@ -95,39 +113,19 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ data }) =>
           </ul>
         }
       />
-      <OverviewSection
+   <OverviewSection
         title="Projects"
         content={
           <div>
-            {data.projects.map((project, index) => (
-              <div key={index} className="mb-2">
-                <ClickableItem 
-                  text={project.title}
-                  action={`Tell me more about the project: ${project.title}`}
-                />
-                <p className="text-sm">{project.shortDescription}</p>
-              </div>
-            ))}
+            <ProjectTimeline projects={data.projects} />
           </div>
         }
       />
-      <OverviewSection
+     <OverviewSection
         title="Education"
-        content={
-          <div>
-            {data.education.map((edu, index) => (
-              <div key={index} className="mb-2">
-                <ClickableItem 
-                  text={edu.institution}
-                  action={`Tell me more about the education at ${edu.institution}`}
-                />
-                <p className="text-sm">{edu.degree} in {edu.fieldOfStudy}</p>
-                <p className="text-sm">{edu.startDate} - {edu.endDate}</p>
-              </div>
-            ))}
-          </div>
-        }
+        content={<EducationTimeline education={data.education} />}
       />
+      
       <OverviewSection
         title="Work Experience"
         content={

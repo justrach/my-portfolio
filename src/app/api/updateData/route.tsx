@@ -21,26 +21,20 @@ async function generateEmbedding(text: string) {
 export async function POST(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const entity = searchParams.get('entity');
-
   if (!entity || !isValidEntity(entity)) {
     return NextResponse.json({ error: 'Invalid entity' }, { status: 400 });
   }
-
   try {
     const data = await request.json();
-
     if (entity === 'projects' && data.technologies && !Array.isArray(data.technologies)) {
       data.technologies = data.technologies.split(',').map((tech: string) => tech.trim());
     }
-
     const embeddingFields = ['shortDescription', 'longDescription', 'name', 'description', 'content', 'bio'];
     const fieldToEmbed = embeddingFields.find(field => data[field]);
-
     if (fieldToEmbed) {
       const embeddingArray = await generateEmbedding(data[fieldToEmbed]);
       data.embedding = embeddingArray;
     }
-
     let updatedEntry;
     switch (entity) {
       case 'projects':
@@ -64,7 +58,15 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json({ error: 'Invalid entity' }, { status: 400 });
     }
-    return NextResponse.json(updatedEntry[0]);
+
+    console.log('Updated entry:', updatedEntry);
+
+    // Convert non-serializable values to JSON-friendly format
+    const serializedEntry = JSON.parse(JSON.stringify(updatedEntry[0]));
+
+    console.log('Serialized entry:', serializedEntry);
+
+    return NextResponse.json(serializedEntry);
   } catch (error) {
     console.error(`Failed to update ${entity}:`, error);
     return NextResponse.json({ error: `Failed to update ${entity}` }, { status: 500 });
