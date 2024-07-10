@@ -11,7 +11,6 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
   },
-  "packageManager": "bun@1",
   "dependencies": {
     "@ai-sdk/anthropic": "^0.0.27",
     "@ai-sdk/google": "^0.0.24",
