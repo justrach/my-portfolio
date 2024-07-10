@@ -3,8 +3,11 @@
 import React, { useCallback } from 'react';
 import Image from 'next/image';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import EducationTimeline from '../portfolio_overview/education_timeline';
-import ProjectTimeline from '../portfolio_overview/project_timeline';
+import EducationTimeline from '../portfolio_overview/education/education_timeline';
+import ProjectTimeline from '../portfolio_overview/project/project_timeline';
+import { Avatar } from '../ui/avatar';
+import { AvatarFallback, AvatarImage } from '@/src/app/components/ui/avatar';
+import { Badge } from '../ui/badge';
 
 export interface PortfolioData {
   personalInfo: Array<{
@@ -81,24 +84,49 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ data }) =>
       <OverviewSection
         title="Personal Information"
         content={
-          <div className="flex flex-col items-center">
-            <div className="mb-4">
-              {/* <p>{Object.keys(data.personalInfo[0])}</p> */}
-              <p><strong>Name:</strong> <ClickableItem text={data.personalInfo[0]?.full_name} action={`Tell me more about ${data.personalInfo[0]?.full_name}`} /></p>
-              <p><strong>Email:</strong> {data.personalInfo[0]?.email}</p>
-              <p><strong>Location:</strong> {data.personalInfo[0]?.location}</p>
-            </div>
-            <Image 
-              src={data.personalInfo[0]?.imageurl}
-              alt="Personal Image"
-              width={150}
-              height={150}
-              className="rounded-full"
-            />
-          </div>
+          <Card className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+      <div className="flex items-center gap-4">
+        <Avatar className="w-16 h-16 border-2 border-primary">
+          <AvatarImage src="https://portfolio.rachit.ai/photo_2024-07-09%2016.25.10.jpeg" />
+          <AvatarFallback>RP</AvatarFallback>
+        </Avatar>
+        <div className="grid gap-1">
+          <div className="text-xl font-semibold">Hi, im <ClickableItem text={data.personalInfo[0]?.full_name} action={`Tell me more about ${data.personalInfo[0]?.full_name}`} /></div>
+          <div className="text-muted-foreground">me@rachit.ai</div>
+        </div>
+      </div>
+      <div className="mt-4 text-sm text-muted-foreground">I&#39;ve just graduated from NUS and heres my profie!</div>
+      <div className="mt-2 text-muted-foreground">
+       Currently working on a few projects, but hey the emails are always open for a chat!
+      </div>
+      <div className="mt-4 flex gap-2">
+  <a href="https://twitter.com/rachpradhan" target="_blank" rel="noopener noreferrer">
+    <Badge variant="secondary" className="bg-black text-white hover:bg-gray-300 hover:text-white">X</Badge>
+  </a>
+  <a href="https://www.linkedin.com/in/rachpradhan/" target="_blank" rel="noopener noreferrer">
+    <Badge variant="secondary" className="bg-blue-400 text-white hover:bg-blue-900 hover:text-white">LINKEDIN</Badge>
+  </a>
+</div>
+    </Card>
+          // <div className="flex flex-col items-center">
+          //   <div className="mb-4">
+          //     {/* <p>{Object.keys(data.personalInfo[0])}</p> */}
+          //     <p><strong>Name:</strong> <ClickableItem text={data.personalInfo[0]?.full_name} action={`Tell me more about ${data.personalInfo[0]?.full_name}`} /></p>
+          //     <p><strong>Email:</strong> {data.personalInfo[0]?.email}</p>
+          //     <p><strong>Location:</strong> {data.personalInfo[0]?.location}</p>
+          //   </div>
+          //   <Image 
+          //     src={data.personalInfo[0]?.imageurl}
+          //     alt="Personal Image"
+          //     width={150}
+          //     height={150}
+          //     className="rounded-full"
+          //   />
+          // </div>
+          // <UserComponent></UserComponent>
         }
       />
-      <OverviewSection
+      {/* <OverviewSection
         title="Skills"
         content={
           <ul className="list-disc pl-5">
@@ -112,7 +140,7 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ data }) =>
             ))}
           </ul>
         }
-      />
+      /> */}
    <OverviewSection
         title="Projects"
         content={

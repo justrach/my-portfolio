@@ -5,20 +5,12 @@ import AccentryComponent from "@/src/app/components/homepage/wordTopLevel";
 import ChatPage from "../../chat/page";
 
 export default function HomeClient() {
-  const [showThread, setShowThread] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowThread(true);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <main className="h-full">
-      {!showThread && <AccentryComponent />}
-      {showThread && (
+      {/* {!showThread && <AccentryComponent />}
+      {showThread && ( */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -27,7 +19,7 @@ export default function HomeClient() {
         >
           <ChatPage />
         </motion.div>
-      )}
+
     </main>
   );
 }

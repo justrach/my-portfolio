@@ -1,0 +1,76 @@
+/* AssistantMobileStyles.css */
+.assistant-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.assistant-content {
+  width: 100%;
+}
+
+.assistant-text, 
+.assistant-buttons {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.assistant-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .assistant-container {
+    padding: 12px;
+  }
+  
+  .assistant-text {
+    font-size: 16px;
+  }
+  
+  .assistant-button {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
+
+.assistant-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.assistant-section {
+  margin-bottom: 20px;
+}
+
+.projects-timeline {
+  position: relative;
+  padding-left: 24px;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #6c757d;
+}
+
+.project-item {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.project-dot {
+  position: absolute;
+  left: -29px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #6c757d;
+}

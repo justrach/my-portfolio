@@ -16,7 +16,7 @@ import { projects, skills, education, thoughts, workExperience, personalInfo } f
 import { CardComponent } from "./components/ui/acc_ui/Card";
 import ProjectOverview from "./components/ui/project_overview";
 import { CodingLanguagesPieChart } from "@/components/client/codingLanguagesPieChart";
-import ProjectTimeline from "@/components/portfolio_overview/project_timeline";
+import ProjectTimeline from "@/components/portfolio_overview/project/project_timeline";
 import ProjectOverviewSection from "@/components/portfolio_overview/project_overview";
 import LoadingAnimation from "@/components/portfolio_overview/loading";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -38,6 +38,7 @@ const pickProjectFields = (project: any) => ({
   short_description: project.short_description || project.shortDescription,
   imageurl: project.image_url || project.imageurl,
   start_date: project.start_date,
+  label: project.label
 });
 export interface ServerMessage {
   role: "user" | "assistant";
@@ -144,7 +145,7 @@ export async function continueConversation(
           projectName: z.string().describe("The name or description of the project to retrieve information about"),
         }),
         generate: async function* ({ projectName }) {
-          yield <div>Loading <LoadingAnimation></LoadingAnimation></div>;
+          yield <div><LoadingAnimation></LoadingAnimation></div>;
           try {
             let project;
       
@@ -175,7 +176,7 @@ export async function continueConversation(
         description: "Get an overview of all projects",
         parameters: z.object({}),
         generate: async function* () {
-          yield <div>Loading <LoadingAnimation></LoadingAnimation></div>;
+          yield <div><LoadingAnimation></LoadingAnimation></div>;
           try {
             const projects = await fetchAllData<Project>('projects');
             const formattedProjects = projects.map(pickProjectFields);
@@ -196,7 +197,7 @@ export async function continueConversation(
           yield <div>Processing your query...</div>;
           // Here you can implement logic to generate a general response
           // For now, we'll just return a simple message
-          return <div>I'm sorry, but I don't have specific information about "{query}". Is there something else I can help you with regarding my projects or skills?</div>;
+          return <div>I&#39;m sorry, but I don&#39;t have specific information about &quot;{query}&quot;. Is there something else I can help you with regarding my projects or skills?</div>;
         },
       },
       generateFollowUpQuestions: {

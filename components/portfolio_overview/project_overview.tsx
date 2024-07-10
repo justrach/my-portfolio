@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import ProjectTimeline, { Project } from '../portfolio_overview/project_timeline';
+import ProjectTimeline, { Project } from './project/project_timeline';
 
 interface ProjectOverviewProps {
   projects: Project[];
