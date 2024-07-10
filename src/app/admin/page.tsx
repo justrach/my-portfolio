@@ -130,7 +130,7 @@ export default function AdminDashboard() {
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-
+  const loginForm = useForm<LoginFormData>();
   const handleLogin: SubmitHandler<LoginFormData> = async (loginData) => {
     try {
       const response = await axios.post('/api/auth', loginData);
@@ -279,27 +279,27 @@ export default function AdminDashboard() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <h1 className="text-3xl font-bold mb-8">Portfolio Admin Dashboard</h1>
       {!isAuthenticated ? (
-        <form onSubmit={handleSubmit(handleLogin)} className="space-y-4">
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
-            <input
-              id="username"
-              type="text"
-              {...register('username', { required: true })}
-              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-            <input
-              id="password"
-              type="password"
-              {...register('password', { required: true })}
-              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
-          <Button type="submit">Login</Button>
-        </form>
+    <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+    <div>
+      <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+      <input
+        id="username"
+        type="text"
+        {...loginForm.register('username', { required: true })}
+        className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      />
+    </div>
+    <div>
+      <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+      <input
+        id="password"
+        type="password"
+        {...loginForm.register('password', { required: true })}
+        className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      />
+    </div>
+    <Button type="submit">Login</Button>
+  </form>
       ) : (
         <TabGroup selectedIndex={selectedTab} onChange={setSelectedTab}>
           <TabList className="flex p-1 space-x-1 bg-blue-900/20 dark:bg-gray-800 rounded-xl mb-8">
@@ -338,10 +338,9 @@ export default function AdminDashboard() {
                           </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-8">
-                          {formFields[tab.entity].map((field) => (
-                            <div key={field.name}>
-                              <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {field.placeholder}
+                        {formFields[tab.entity as EntityName].map((field) => (
+  <div key={field.name}>
+    <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">    {field.placeholder}
                               </label>
                               {field.type === 'textarea' ? (
                                 <textarea
@@ -351,10 +350,10 @@ export default function AdminDashboard() {
                                 />
                               ) : field.type === 'date' ? (
                                 <DatePicker
-                                  selected={watch(field.name) as Date}
-                                  onChange={(date: Date) => setValue(field.name, date)}
-                                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                />
+                                selected={watch(field.name) as Date | null}
+                                onChange={(date: Date | null) => setValue(field.name, date!)}
+                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                              />
                               ) : (
                                 <input
                                   type={field.type}
@@ -414,10 +413,9 @@ export default function AdminDashboard() {
                                         <DialogDescription>Make changes to the item here.</DialogDescription>
                                       </DialogHeader>
                                       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-8">
-                                        {formFields[tab.entity].map((field) => (
-                                          <div key={field.name}>
-                                            <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                              {field.placeholder}
+                                      {formFields[tab.entity as EntityName].map((field) => (
+  <div key={field.name}>
+    <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">    {field.placeholder}
                                             </label>
                                             {field.type === 'textarea' ? (
                                               <textarea
@@ -427,10 +425,10 @@ export default function AdminDashboard() {
                                               />
                                             ) : field.type === 'date' ? (
                                               <DatePicker
-                                                selected={watch(field.name) as Date}
-                                                onChange={(date: Date) => setValue(field.name, date)}
-                                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                              />
+                                              selected={watch(field.name) as Date}
+                                              onChange={(date: Date | null) => date && setValue(field.name, date)}
+                                              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            />
                                             ) : (
                                               <input
                                                 type={field.type}
