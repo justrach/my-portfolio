@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createOpenAI } from "@ai-sdk/openai";
-import OpenAI from "openai";
+import { anthropic } from '@ai-sdk/anthropic';
+import { generateText } from 'ai';
 import { z } from 'zod';
-import { createAnthropic } from '@ai-sdk/anthropic';
 
 const dateRangeSchema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -11,48 +10,36 @@ const dateRangeSchema = z.object({
 
 const MAX_RETRIES = 17;
 
-async function getCompletion(anthropic: any, message: any) {
-  const model = anthropic('claude-3-5-sonnet-20240620');
-  const completion = await anthropic.chat.completions.create({
-    messages: [
-      {
-        role: "system",
-        content: `Convert the following natural language date ranges into the format YYYY-MM-DD and return only the JSON format with fields "startDate" and "endDate":
+async function getCompletion(message: any) {
+  const { text } = await generateText({
+    model: anthropic('claude-3-5-sonnet-20240620'),
+    prompt: `Convert the following natural language date ranges into the format YYYY-MM-DD and return only the JSON format with fields "startDate" and "endDate":
 {
   "startDate": "YYYY-MM-DD",
   "endDate": "YYYY-MM-DD"
-}`
-      },
-      message
-    ],
-    model,
+}
+
+User input: ${message.content}`
   });
 
-  return completion.choices[0].message.content;
+  return text;
 }
-// change
+
 export async function POST(req: NextRequest) {
   const { messages } = await req.json();
-  const apiKey = process.env.GROQ_API_KEY;
-
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: 'API key is missing' }, { status: 400 });
   }
-  const anthropic = createAnthropic({
-    // custom settings
-  });
-
-
 
   const message = messages[0];
   let attempts = 0;
 
   while (attempts < MAX_RETRIES) {
     try {
-      const content = await getCompletion(anthropic, message);
-      const parsedContent = JSON.parse(content || ''); // Handle null by providing a default value
+      const content = await getCompletion(message);
+      const parsedContent = JSON.parse(content || '{}');
       dateRangeSchema.parse(parsedContent);
-      // console.log(parsedContent)
       return NextResponse.json(parsedContent);
     } catch (error) {
       attempts += 1;
