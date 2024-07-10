@@ -29,7 +29,7 @@ async function getCompletion(groq2: OpenAI, message: any) {
 
   return completion.choices[0].message.content;
 }
-
+// change
 export async function POST(req: NextRequest) {
   const { messages } = await req.json();
   const apiKey = process.env.GROQ_API_KEY;
