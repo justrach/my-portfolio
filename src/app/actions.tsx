@@ -33,7 +33,7 @@ const anthropic = createAnthropic({
   // custom settings
 });
 const model = anthropic('claude-3-5-sonnet-20240620');
-
+// if anthropic fails use groq
 // const model = groq('llama3-8b-8192');
 interface Project {
   id: string;
