@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createOpenAI } from "@ai-sdk/openai";
 import OpenAI from "openai";
 import { z } from 'zod';
+import { createAnthropic } from '@ai-sdk/anthropic';
 
 const dateRangeSchema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -10,9 +11,9 @@ const dateRangeSchema = z.object({
 
 const MAX_RETRIES = 17;
 
-async function getCompletion(groq2: OpenAI, message: any) {
-  const model = 'llama3-8b-8192';
-  const completion = await groq2.chat.completions.create({
+async function getCompletion(anthropic: any, message: any) {
+  const model = anthropic('claude-3-5-sonnet-20240620');
+  const completion = await anthropic.chat.completions.create({
     messages: [
       {
         role: "system",
@@ -37,18 +38,18 @@ export async function POST(req: NextRequest) {
   if (!apiKey) {
     return NextResponse.json({ error: 'API key is missing' }, { status: 400 });
   }
-
-  const groq2 = new OpenAI({
-    baseURL: 'https://api.groq.com/openai/v1',
-    apiKey,
+  const anthropic = createAnthropic({
+    // custom settings
   });
+
+
 
   const message = messages[0];
   let attempts = 0;
 
   while (attempts < MAX_RETRIES) {
     try {
-      const content = await getCompletion(groq2, message);
+      const content = await getCompletion(anthropic, message);
       const parsedContent = JSON.parse(content || ''); // Handle null by providing a default value
       dateRangeSchema.parse(parsedContent);
       // console.log(parsedContent)

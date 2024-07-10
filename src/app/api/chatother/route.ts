@@ -1,3 +1,4 @@
+import { createAnthropic } from '@ai-sdk/anthropic';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from "openai";
 import { z } from 'zod';
@@ -12,9 +13,9 @@ const enhancedDateSchema = z.object({
 
 const MAX_RETRIES = 9;
 
-async function getCompletion(groq2: OpenAI, message: any) {
-  const model = 'llama3-70b-8192';
-  const completion = await groq2.chat.completions.create({
+async function getCompletion(anthropic: any, message: any) {
+  const model = anthropic('claude-3-5-sonnet-20240620');
+  const completion = await anthropic.chat.completions.create({
     temperature: 0,
     messages: [
       {
@@ -38,15 +39,15 @@ export async function POST(req: NextRequest) {
   if (!apiKey) {
     return NextResponse.json({ error: 'API key is missing' }, { status: 400 });
   }
-  const groq2 = new OpenAI({
-    baseURL: 'https://api.groq.com/openai/v1',
-    apiKey,
+  const anthropic = createAnthropic({
+    // custom settings
   });
+
   const message = description;
   let attempts = 0;
   while (attempts < MAX_RETRIES) {
     try {
-      const content = await getCompletion(groq2, message);
+      const content = await getCompletion(anthropic, message);
       const parsedContent = { enhancedDescription: content };
       enhancedDescriptionSchema.parse(parsedContent);
       return NextResponse.json(parsedContent);
@@ -74,7 +75,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'API key is missing' }, { status: 400 });
   }
 
-  const groq2 = new OpenAI({
+  const anthropic = new OpenAI({
     baseURL: 'https://api.groq.com/openai/v1',
     apiKey,
   });
@@ -96,7 +97,7 @@ Output only the duration, e.g., "3 days in June 2023" or "4 months from July 202
   let attempts = 0;
   while (attempts < MAX_RETRIES) {
     try {
-      const content = await getCompletion(groq2, message);
+      const content = await getCompletion(anthropic, message);
       const parsedContent = { enhancedDate: content };
       enhancedDateSchema.parse(parsedContent);
       return NextResponse.json(parsedContent);

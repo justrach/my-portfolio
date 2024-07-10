@@ -32,9 +32,9 @@ const groq = createOpenAI({
 const anthropic = createAnthropic({
   // custom settings
 });
-// const model = anthropic('claude-3-haiku-20240307');
+const model = anthropic('claude-3-5-sonnet-20240620');
 
-const model = groq('llama3-8b-8192');
+// const model = groq('llama3-8b-8192');
 interface Project {
   id: string;
   title: string;

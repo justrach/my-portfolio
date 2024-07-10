@@ -1,11 +1,12 @@
+import { createAnthropic } from '@ai-sdk/anthropic';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from "openai";
 
 const MAX_RETRIES = 3;
 
-async function getCompletion(groq: OpenAI, messages: any[]) {
-  const model = 'llama3-70b-8192';
-  const completion = await groq.chat.completions.create({
+async function getCompletion(anthropic: any, messages: any[]) {
+  const model = anthropic('claude-3-5-sonnet-20240620');
+  const completion = await anthropic.chat.completions.create({
     temperature: 0.7,
     max_tokens: 1000,
     messages: [
@@ -31,21 +32,21 @@ async function getCompletion(groq: OpenAI, messages: any[]) {
 
 export async function POST(req: NextRequest) {
   const { messages } = await req.json();
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.anthropic_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json({ error: 'API key is missing' }, { status: 400 });
   }
 
-  const groq = new OpenAI({
-    baseURL: 'https://api.groq.com/openai/v1',
-    apiKey,
+  const anthropic = createAnthropic({
+    // custom settings
   });
+
 
   let attempts = 0;
   while (attempts < MAX_RETRIES) {
     try {
-      const response = await getCompletion(groq, messages);
+      const response = await getCompletion(anthropic, messages);
       return NextResponse.json(response);
     } catch (error) {
       attempts += 1;
