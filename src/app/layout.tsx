@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { MyRuntimeProvider } from "@/src/app/MyRuntimeProvider";
 import { cn } from "@/src/app/lib/utils";
 import "./globals.css";
 import { AI } from "./actions";

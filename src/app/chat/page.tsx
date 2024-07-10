@@ -117,7 +117,7 @@ export default function ChatPage() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 dark:text-gray-200 mb-2 sm:mb-4">
+              <h1 className="text-xl sm:text-4xl font-bold text-gray-800 dark:text-gray-200 mb-2 sm:mb-4">
                Hey nice to see you on my portfolio website! I am <FlipWords words={words}/>  
               </h1>
               <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 mb-4 sm:mb-8">
