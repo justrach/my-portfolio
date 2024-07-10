@@ -92,13 +92,13 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ data }) =>
             </Avatar>
             <div className="grid gap-1">
               <div className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                Hi, I'm <ClickableItem text={data.personalInfo[0]?.full_name} action={`Tell me more about ${data.personalInfo[0]?.full_name}`} />
+                Hi, I&#39;m <ClickableItem text={data.personalInfo[0]?.full_name} action={`Tell me more about ${data.personalInfo[0]?.full_name}`} />
               </div>
               <div className="text-gray-500 dark:text-gray-400">me@rachit.ai</div>
             </div>
           </div>
           <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-            I&#39;ve just graduated from NUS and here's my profile!
+            I&#39;ve just graduated from NUS and here&#39;s my profile!
           </div>
           <div className="mt-2 text-gray-500 dark:text-gray-400">
             Currently working on a few projects, but hey, the emails are always open for a chat!
