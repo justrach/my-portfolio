@@ -151,7 +151,31 @@ export default function AdminDashboard() {
       });
     }
   };
+  const convertNaturalLanguageDates = async (text: string) => {
+    try {
+      const response = await axios.post('/api/chat', {
+        messages: [{ role: 'user', content: text }],
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error converting dates:', error);
+      toast({
+        title: "Error",
+        description: 'Failed to convert dates',
+      });
+    }
+  };
 
+  const handleDateRangeConversion = async () => {
+    const dateRangeText = watch('dateRange') as string;
+    if (dateRangeText) {
+      const convertedDateRange = await convertNaturalLanguageDates(dateRangeText);
+      if (convertedDateRange && convertedDateRange.startDate && convertedDateRange.endDate) {
+        setValue('startDate', new Date(convertedDateRange.startDate));
+        setValue('endDate', new Date(convertedDateRange.endDate));
+      }
+    }
+  };
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -338,9 +362,10 @@ export default function AdminDashboard() {
                           </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-8">
-                        {formFields[tab.entity as EntityName].map((field) => (
-  <div key={field.name}>
-    <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">    {field.placeholder}
+                          {formFields[tab.entity as EntityName].map((field) => (
+                            <div key={field.name}>
+                              <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {field.placeholder}
                               </label>
                               {field.type === 'textarea' ? (
                                 <textarea
@@ -350,10 +375,10 @@ export default function AdminDashboard() {
                                 />
                               ) : field.type === 'date' ? (
                                 <DatePicker
-                                selected={watch(field.name) as Date | null}
-                                onChange={(date: Date | null) => setValue(field.name, date!)}
-                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                              />
+                                  selected={watch(field.name) as Date}
+                                  onChange={(date: Date | null) => date && setValue(field.name, date)}
+                                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                />
                               ) : (
                                 <input
                                   type={field.type}
@@ -364,6 +389,26 @@ export default function AdminDashboard() {
                               )}
                             </div>
                           ))}
+                          {(tab.entity === 'projects' || tab.entity === 'education' || tab.entity === 'workExperience') && (
+                            <div>
+                              <label htmlFor="dateRange" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date Range</label>
+                              <div className="flex items-center">
+                                <input
+                                  id="dateRange"
+                                  {...register('dateRange')}
+                                  placeholder="e.g., 7th July to 15th December 2023"
+                                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                                />
+                                <Button
+                                  type="button"
+                                  onClick={handleDateRangeConversion}
+                                  className="ml-2"
+                                >
+                                  Convert
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                           <div className="flex justify-between">
                             <Button type="submit" disabled={loading}>
                               {loading ? 'Saving...' : 'Save'}
@@ -413,9 +458,10 @@ export default function AdminDashboard() {
                                         <DialogDescription>Make changes to the item here.</DialogDescription>
                                       </DialogHeader>
                                       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-8">
-                                      {formFields[tab.entity as EntityName].map((field) => (
-  <div key={field.name}>
-    <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">    {field.placeholder}
+                                        {formFields[tab.entity as EntityName].map((field) => (
+                                          <div key={field.name}>
+                                            <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                              {field.placeholder}
                                             </label>
                                             {field.type === 'textarea' ? (
                                               <textarea
@@ -425,10 +471,10 @@ export default function AdminDashboard() {
                                               />
                                             ) : field.type === 'date' ? (
                                               <DatePicker
-                                              selected={watch(field.name) as Date}
-                                              onChange={(date: Date | null) => date && setValue(field.name, date)}
-                                              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                            />
+                                                selected={watch(field.name) as Date}
+                                                onChange={(date: Date | null) => date && setValue(field.name, date)}
+                                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                              />
                                             ) : (
                                               <input
                                                 type={field.type}
@@ -439,6 +485,26 @@ export default function AdminDashboard() {
                                             )}
                                           </div>
                                         ))}
+                                        {(tab.entity === 'projects' || tab.entity === 'education' || tab.entity === 'workExperience') && (
+                                          <div>
+                                            <label htmlFor="dateRange" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date Range</label>
+                                            <div className="flex items-center">
+                                              <input
+                                                id="dateRange"
+                                                {...register('dateRange')}
+                                                placeholder="e.g., 7th July to 15th December 2023"
+                                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                                              />
+                                              <Button
+                                                type="button"
+                                                onClick={handleDateRangeConversion}
+                                                className="ml-2"
+                                              >
+                                                Convert
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        )}
                                         <div className="flex justify-between">
                                           <Button type="submit" disabled={loading}>
                                             {loading ? 'Saving...' : 'Save'}
@@ -447,39 +513,39 @@ export default function AdminDashboard() {
                                             Cancel
                                           </Button>
                                         </div>
-                                      </form>
-                                    </ScrollArea>
-                                  </DialogContent>
-                                </Dialog>
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button onClick={() => setConfirmDelete(item)} variant="destructive" size="sm">
-                                      <TrashIcon className="w-4 h-4" />
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent>
-                                    <DialogHeader>
-                                      <DialogTitle>Confirm Deletion</DialogTitle>
-                                      <DialogDescription>
-                                        Are you sure you want to delete this item? This action cannot be undone.
-                                      </DialogDescription>
-                                    </DialogHeader>
-                                    <DialogFooter>
-                                      <Button onClick={() => setConfirmDelete(null)} variant="outline">
-                                        Cancel
-                                      </Button>
-                                      <Button onClick={handleDeleteClick} variant="destructive">
-                                        Delete
-                                      </Button>
-                                    </DialogFooter>
-                                  </DialogContent>
-                                </Dialog>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                                        </form>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button onClick={() => setConfirmDelete(item)} variant="destructive" size="sm">
+                  <TrashIcon className="w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Confirm Deletion</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to delete this item? This action cannot be undone.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button onClick={() => setConfirmDelete(null)} variant="outline">
+                    Cancel
+                  </Button>
+                  <Button onClick={handleDeleteClick} variant="destructive">
+                    Delete
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
                   )}
                 </div>
               </TabPanel>
