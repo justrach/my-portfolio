@@ -172,8 +172,10 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ data }) =>
                   text={`${exp.company} - ${exp.position}`}
                   action={`Tell me more about the work experience at ${exp.company}`}
                 />
-                <p className="text-sm">{exp.startDate} - {exp.endDate}</p>
+                <div className="p-2"></div>
+                {/* <p className="text-sm">{exp.startDate} - {exp.endDate}</p> */}
                 <p className="text-sm">{exp.description}</p>
+                <div className="p-2"></div>
               </div>
             ))}
           </div>
@@ -183,8 +185,11 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ data }) =>
         title="Recent Thoughts"
         content={
           <div>
+                <div>My brains kinda empty rn :{">"}</div>
             {data.thoughts.slice(0, 3).map((thought, index) => (
               <div key={index} className="mb-2">
+    
+        
                 <ClickableItem 
                   text={thought.topic}
                   action={`Tell me more about the thought: ${thought.topic}`}

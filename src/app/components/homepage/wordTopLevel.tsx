@@ -3,7 +3,7 @@ import { FlipWords } from "@/src/app/components/ui/flip_words";
 import React from "react";
 
 
-export const words = ['rach', 'rach pradhan'];
+export const words = ['Rach','Rach Pradhan'];
 
 
 

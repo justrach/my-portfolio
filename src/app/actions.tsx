@@ -22,11 +22,18 @@ import LoadingAnimation from "@/components/portfolio_overview/loading";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { createAnthropic } from '@ai-sdk/anthropic';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const groq = createOpenAI({
   baseURL: 'https://api.groq.com/openai/v1',
   apiKey: process.env.GROQ_API_KEY,
 });
+// adding anthropic 3.5 sonnet support
+const anthropic = createAnthropic({
+  // custom settings
+});
+// const model = anthropic('claude-3-haiku-20240307');
+
 const model = groq('llama3-8b-8192');
 interface Project {
   id: string;
