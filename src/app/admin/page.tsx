@@ -125,7 +125,7 @@ function FormField({ field, register }: { field: { name: string; type: string; p
       <textarea
         {...register(field.name)}
         placeholder={field.placeholder}
-        className="w-full p-2 border rounded"
+        className="w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
       />
     );
   }
@@ -134,7 +134,7 @@ function FormField({ field, register }: { field: { name: string; type: string; p
       {...register(field.name)}
       type={field.type}
       placeholder={field.placeholder}
-      className="w-full p-2 border rounded"
+      className="w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
     />
   );
 }
@@ -306,17 +306,17 @@ export default function AdminDashboard() {
   const endDate = watch('endDate') as Date;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <h1 className="text-3xl font-bold mb-8">Portfolio Admin Dashboard</h1>
       <TabGroup selectedIndex={selectedTab} onChange={setSelectedTab}>
-        <TabList className="flex p-1 space-x-1 bg-blue-900/20 rounded-xl mb-8">
+        <TabList className="flex p-1 space-x-1 bg-blue-900/20 dark:bg-gray-800 rounded-xl mb-8">
           {tabs.map((tab) => (
             <Tab
               key={tab.name}
               className={({ selected }) =>
-                `w-full py-2.5 text-sm font-medium leading-5 text-blue-700 rounded-lg
-                focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 ring-white ring-opacity-60
-                ${selected ? 'bg-white shadow' : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'}`
+                `w-full py-2.5 text-sm font-medium leading-5 text-blue-700 dark:text-gray-100 rounded-lg
+                focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 dark:ring-offset-gray-800 ring-white ring-opacity-60
+                ${selected ? 'bg-white dark:bg-gray-700 shadow' : 'text-blue-100 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-gray-600 hover:text-white'}`
               }
             >
               {tab.name}
@@ -325,7 +325,7 @@ export default function AdminDashboard() {
         </TabList>
         <TabPanels>
           {tabs.map((tab) => (
-            <TabPanel key={tab.name} className="bg-white rounded-xl p-3">
+            <TabPanel key={tab.name} className="bg-white dark:bg-gray-800 rounded-xl p-3">
               <div>
                 <Dialog>
                   <DialogTrigger asChild>
@@ -336,7 +336,7 @@ export default function AdminDashboard() {
                       Add New
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
+                  <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800">
                     <ScrollArea className="h-[400px] w-full">
                       <DialogHeader>
                         <DialogTitle>{selectedItem && selectedItem.id ? 'Edit Item' : 'Add New Item'}</DialogTitle>
@@ -350,40 +350,40 @@ export default function AdminDashboard() {
                         ))}
                         {(tab.entity === 'projects' || tab.entity === 'education' || tab.entity === 'workExperience') && (
                           <div>
-                            <label htmlFor="dateRange" className="block text-sm font-medium text-gray-700">Date Range</label>
+                            <label htmlFor="dateRange" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date Range</label>
                             <div className="flex items-center">
                               <input
                                 id="dateRange"
                                 {...register('dateRange')}
                                 placeholder="e.g., 7th July to 15th December 2023"
-                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
                               />
                               <button
                                 type="button"
                                 onClick={handleDateRangeConversion}
-                                className="ml-2 px-3 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                className="ml-2 px-3 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                               >
                                 Convert
                               </button>
                             </div>
                             <div className="mt-4">
-                              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
+                              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
                               <DatePicker
                                 id="startDate"
                                 selected={startDate}
                                 onChange={(date) => setValue('startDate', date!)}
                                 dateFormat="yyyy-MM-dd"
-                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
                               />
                             </div>
                             <div className="mt-4">
-                              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date</label>
+                              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
                               <DatePicker
                                 id="endDate"
                                 selected={endDate}
                                 onChange={(date) => setValue('endDate', date!)}
                                 dateFormat="yyyy-MM-dd"
-                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
                               />
                             </div>
                           </div>
@@ -399,14 +399,14 @@ export default function AdminDashboard() {
                           <button
                             type="button"
                             onClick={handleCancelClick}
-                            className="ml-2 px-3 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                            className="ml-2 px-3 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-red-400"
                           >
                             Cancel
                           </button>
                         </div>
                       </form>
                       {error && (
-                        <div className="mt-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                        <div className="mt-4 p-2 bg-red-100 dark:bg-red-700 border border-red-400 text-red-700 dark:text-red-100 rounded">
                           {error}
                         </div>
                       )}
@@ -415,38 +415,38 @@ export default function AdminDashboard() {
                 </Dialog>
                 {isLoading ? (
                   <div className="space-y-2">
-                    <Skeleton className="h-12 w-full rounded" />
-                    <Skeleton className="h-12 w-full rounded" />
-                    <Skeleton className="h-12 w-full rounded" />
+                    <Skeleton className="h-12 w-full rounded bg-gray-200 dark:bg-gray-700" />
+                    <Skeleton className="h-12 w-full rounded bg-gray-200 dark:bg-gray-700" />
+                    <Skeleton className="h-12 w-full rounded bg-gray-200 dark:bg-gray-700" />
                   </div>
                 ) : (
-                  <Table>
-                    <TableCaption>A list of your recent {tab.name.toLowerCase()}.</TableCaption>
+                  <Table className="bg-white dark:bg-gray-800">
+                    <TableCaption className="text-gray-900 dark:text-gray-100">A list of your recent {tab.name.toLowerCase()}.</TableCaption>
                     <TableHeader>
                       <TableRow>
                         {Object.keys(data[tab.entity]?.[0] || {}).map((key) => (
-                          <TableHead key={key}>{key}</TableHead>
+                          <TableHead key={key} className="text-gray-900 dark:text-gray-100">{key}</TableHead>
                         ))}
-                        <TableHead>Actions</TableHead>
+                        <TableHead className="text-gray-900 dark:text-gray-100">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {data[tab.entity]?.map((item: any) => (
                         <TableRow key={item.id}>
                           {Object.keys(item).map((key) => (
-                            <TableCell key={key}>{item[key]}</TableCell>
+                            <TableCell key={key} className="text-gray-900 dark:text-gray-100">{item[key]}</TableCell>
                           ))}
-                          <TableCell className="flex space-x-2">
+                          <TableCell className="flex space-x-2 text-gray-900 dark:text-gray-100">
                             <Dialog>
                               <DialogTrigger asChild>
                                 <button
                                   onClick={() => handleEditClick(item)}
-                                  className="text-indigo-600 hover:text-indigo-900"
+                                  className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-600"
                                 >
                                   <PencilIcon className="w-5 h-5" />
                                 </button>
                               </DialogTrigger>
-                              <DialogContent className="sm:max-w-[425px]">
+                              <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800">
                                 <ScrollArea className="h-[400px] w-full">
                                   <DialogHeader>
                                     <DialogTitle>Edit Item</DialogTitle>
@@ -460,40 +460,40 @@ export default function AdminDashboard() {
                                     ))}
                                     {(tab.entity === 'projects' || tab.entity === 'education' || tab.entity === 'workExperience') && (
                                       <div>
-                                        <label htmlFor="dateRange" className="block text-sm font-medium text-gray-700">Date Range</label>
+                                        <label htmlFor="dateRange" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date Range</label>
                                         <div className="flex items-center">
                                           <input
                                             id="dateRange"
                                             {...register('dateRange')}
                                             placeholder="e.g., 7th July to 15th December 2023"
-                                            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
                                           />
                                           <button
                                             type="button"
                                             onClick={handleDateRangeConversion}
-                                            className="ml-2 px-3 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            className="ml-2 px-3 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                                           >
                                             Convert
                                           </button>
                                         </div>
                                         <div className="mt-4">
-                                          <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
+                                          <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
                                           <DatePicker
                                             id="startDate"
                                             selected={startDate}
                                             onChange={(date) => setValue('startDate', date!)}
                                             dateFormat="yyyy-MM-dd"
-                                            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
                                           />
                                         </div>
                                         <div className="mt-4">
-                                          <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date</label>
+                                          <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
                                           <DatePicker
                                             id="endDate"
                                             selected={endDate}
                                             onChange={(date) => setValue('endDate', date!)}
                                             dateFormat="yyyy-MM-dd"
-                                            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
                                           />
                                         </div>
                                       </div>
@@ -509,14 +509,14 @@ export default function AdminDashboard() {
                                       <button
                                         type="button"
                                         onClick={handleCancelClick}
-                                        className="ml-2 px-3 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                        className="ml-2 px-3 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-red-400"
                                       >
                                         Cancel
                                       </button>
                                     </div>
                                   </form>
                                   {error && (
-                                    <div className="mt-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                                    <div className="mt-4 p-2 bg-red-100 dark:bg-red-700 border border-red-400 text-red-700 dark:text-red-100 rounded">
                                       {error}
                                     </div>
                                   )}
@@ -526,13 +526,13 @@ export default function AdminDashboard() {
                             <Dialog>
                               <DialogTrigger asChild>
                                 <button
-                                  className="text-red-600 hover:text-red-900"
+                                  className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-600"
                                   onClick={() => setConfirmDelete(item)}
                                 >
                                   <TrashIcon className="w-5 h-5" />
                                 </button>
                               </DialogTrigger>
-                              <DialogContent className="sm:max-w-[425px]">
+                              <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800">
                                 <DialogHeader>
                                   <DialogTitle>Confirm Deletion</DialogTitle>
                                   <DialogDescription>
@@ -553,8 +553,8 @@ export default function AdminDashboard() {
                     </TableBody>
                     <TableFooter>
                       <TableRow>
-                        <TableCell colSpan={Object.keys(data[tab.entity]?.[0] || {}).length}>Total</TableCell>
-                        <TableCell className="text-right">Total Count: {data[tab.entity]?.length}</TableCell>
+                        <TableCell colSpan={Object.keys(data[tab.entity]?.[0] || {}).length} className="text-gray-900 dark:text-gray-100">Total</TableCell>
+                        <TableCell className="text-right text-gray-900 dark:text-gray-100">Total Count: {data[tab.entity]?.length}</TableCell>
                       </TableRow>
                     </TableFooter>
                   </Table>

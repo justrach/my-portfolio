@@ -84,30 +84,38 @@ export const PortfolioOverview: React.FC<PortfolioOverviewProps> = ({ data }) =>
       <OverviewSection
         title="Personal Information"
         content={
-          <Card className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-      <div className="flex items-center gap-4">
-        <Avatar className="w-16 h-16 border-2 border-primary">
-          <AvatarImage src="https://portfolio.rachit.ai/photo_2024-07-09%2016.25.10.jpeg" />
-          <AvatarFallback>RP</AvatarFallback>
-        </Avatar>
-        <div className="grid gap-1">
-          <div className="text-xl font-semibold">Hi, im <ClickableItem text={data.personalInfo[0]?.full_name} action={`Tell me more about ${data.personalInfo[0]?.full_name}`} /></div>
-          <div className="text-muted-foreground">me@rachit.ai</div>
-        </div>
-      </div>
-      <div className="mt-4 text-sm text-muted-foreground">I&#39;ve just graduated from NUS and heres my profie!</div>
-      <div className="mt-2 text-muted-foreground">
-       Currently working on a few projects, but hey the emails are always open for a chat!
-      </div>
-      <div className="mt-4 flex gap-2">
-  <a href="https://twitter.com/rachpradhan" target="_blank" rel="noopener noreferrer">
-    <Badge variant="secondary" className="bg-black text-white hover:bg-gray-300 hover:text-white">X</Badge>
-  </a>
-  <a href="https://www.linkedin.com/in/rachpradhan/" target="_blank" rel="noopener noreferrer">
-    <Badge variant="secondary" className="bg-blue-400 text-white hover:bg-blue-900 hover:text-white">LINKEDIN</Badge>
-  </a>
-</div>
-    </Card>
+          <Card className="w-full max-w-md p-6  rounded-lg ">
+          <div className="flex items-center gap-4">
+            <Avatar className="w-16 h-16 border-2 border-primary">
+              <AvatarImage src="https://portfolio.rachit.ai/photo_2024-07-09%2016.25.10.jpeg" />
+              <AvatarFallback>RP</AvatarFallback>
+            </Avatar>
+            <div className="grid gap-1">
+              <div className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                Hi, I'm <ClickableItem text={data.personalInfo[0]?.full_name} action={`Tell me more about ${data.personalInfo[0]?.full_name}`} />
+              </div>
+              <div className="text-gray-500 dark:text-gray-400">me@rachit.ai</div>
+            </div>
+          </div>
+          <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+            I&#39;ve just graduated from NUS and here's my profile!
+          </div>
+          <div className="mt-2 text-gray-500 dark:text-gray-400">
+            Currently working on a few projects, but hey, the emails are always open for a chat!
+          </div>
+          <div className="mt-4 flex gap-2">
+            <a href="https://twitter.com/rachpradhan" target="_blank" rel="noopener noreferrer">
+              <Badge variant="secondary" className="bg-black dark:bg-gray-700 text-white hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-white">
+                X
+              </Badge>
+            </a>
+            <a href="https://www.linkedin.com/in/rachpradhan/" target="_blank" rel="noopener noreferrer">
+              <Badge variant="secondary" className="bg-blue-400 dark:bg-blue-500 text-white hover:bg-blue-900 dark:hover:bg-blue-700 hover:text-white">
+                LINKEDIN
+              </Badge>
+            </a>
+          </div>
+        </Card>
           // <div className="flex flex-col items-center">
           //   <div className="mb-4">
           //     {/* <p>{Object.keys(data.personalInfo[0])}</p> */}

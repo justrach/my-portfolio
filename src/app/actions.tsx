@@ -19,6 +19,9 @@ import { CodingLanguagesPieChart } from "@/components/client/codingLanguagesPieC
 import ProjectTimeline from "@/components/portfolio_overview/project/project_timeline";
 import ProjectOverviewSection from "@/components/portfolio_overview/project_overview";
 import LoadingAnimation from "@/components/portfolio_overview/loading";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const groq = createOpenAI({
   baseURL: 'https://api.groq.com/openai/v1',
@@ -592,9 +595,38 @@ export async function continueConversation(
             });
     
             return (
-              <div style={{ border: '1px solid #ccc', padding: '20px', margin: '10px 0', borderRadius: '8px' }}>
-                <ReactMarkdown>{infoMarkdown}</ReactMarkdown>
+              <Card className="w-full max-w-md p-6  rounded-lg shadow-md">
+              <div className="flex items-center gap-4">
+                <Avatar className="w-16 h-16 border-2 border-primary">
+                  <AvatarImage src="https://portfolio.rachit.ai/photo_2024-07-09%2016.25.10.jpeg" />
+                  <AvatarFallback>RP</AvatarFallback>
+                </Avatar>
+                <div className="grid gap-1">
+                  <div className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                    Hi, I'm Rach <div/>
+                  </div>
+                  <div className="text-gray-500 dark:text-gray-400">me@rachit.ai</div>
+                </div>
               </div>
+              <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                I&#39;ve just graduated from NUS and here's my profile!
+              </div>
+              <div className="mt-2 text-gray-500 dark:text-gray-400">
+                Currently working on a few projects, but hey, the emails are always open for a chat!
+              </div>
+              <div className="mt-4 flex gap-2">
+                <a href="https://twitter.com/rachpradhan" target="_blank" rel="noopener noreferrer">
+                  <Badge variant="secondary" className="bg-black dark:bg-gray-700 text-white hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-white">
+                    X
+                  </Badge>
+                </a>
+                <a href="https://www.linkedin.com/in/rachpradhan/" target="_blank" rel="noopener noreferrer">
+                  <Badge variant="secondary" className="bg-blue-400 dark:bg-blue-500 text-white hover:bg-blue-900 dark:hover:bg-blue-700 hover:text-white">
+                    LINKEDIN
+                  </Badge>
+                </a>
+              </div>
+            </Card>
             );
           } catch (error) {
             console.error('Error fetching personal information:', error);

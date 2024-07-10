@@ -140,10 +140,10 @@ export default function ChatPage() {
                   </div>
                 )}
                 <div
-                  className={`p-3 sm:p-4 rounded-lg text-sm sm:text-base ${
+                  className={`p-3 sm:p-4 text-sm sm:text-base ${
                     message.role === 'user'
-                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow'
-                      : 'bg-white dark:bg-black text-gray-800 dark:text-gray-200 shadow'
+                      ? 'bg-gray-200 rounded-full dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow'
+                      : 'bg-white rounded-xl dark:bg-black text-gray-800 dark:text-gray-200 shadow'
                   }`}
                 >
                   {typeof message.display === 'string' ? (
