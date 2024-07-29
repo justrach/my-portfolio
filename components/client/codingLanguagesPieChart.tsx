@@ -84,7 +84,7 @@ export function CodingLanguagesPieChart() {
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
+    <div className="w-full max-w-3xl mx-auto">
       <CardHeader>
       <CardTitle>Coding Languages Proficiency{'<Live from Wakatime>'}</CardTitle>
 <CardDescription>Based on usage percentage (Top 10 shown in chart)</CardDescription></CardHeader>
@@ -127,6 +127,6 @@ export function CodingLanguagesPieChart() {
           </div>
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 }

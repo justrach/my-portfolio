@@ -56,14 +56,15 @@ export default function RootLayout({
   return (
     <AI>
       <html lang="en" className="h-full">
-      <ThemeProvider
+    
+        <body className={cn(inter.className, "h-full")}>  <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
-          >
-        <body className={cn(inter.className, "h-full")}>{children}</body>
-        </ThemeProvider>
+          >{children}
+          </ThemeProvider></body>
+
       </html>
     </AI>
   );
